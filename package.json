@@ -1,7 +1,7 @@
 {
   "name": "libsis",
   "version": "1.0.0",
-  "description": "Prototipo libreria el cambiazo",
+  "description": "Sistema para libreria el cambiazo",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,14 +12,21 @@
   },
   "keywords": [
     "libreria",
-    "analisis",
+    "administracion",
     "angular",
-    "sql"
+    "node",
+    "express"
   ],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/FcoMdz/LibSis/issues"
   },
-  "homepage": "https://github.com/FcoMdz/LibSis#readme"
+  "homepage": "https://github.com/FcoMdz/LibSis#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mysql": "^2.18.1"
+  }
 }
