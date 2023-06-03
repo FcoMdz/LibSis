@@ -6,7 +6,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
-app.use(rutas)
+
+app.use('/', rutas);
 
 app.listen(PORT, () => {
     console.log("Servidor escuchando en el puerto " + PORT);
