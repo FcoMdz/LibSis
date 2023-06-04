@@ -6,10 +6,15 @@ import {HttpClient } from '@angular/common/http';
 export class SQLService {
   public URL:string = "http://localhost:3000"
   constructor(private httpClient:HttpClient) { }
-  consulta(url:string){
+  async consulta(url:string){
     return this.httpClient.get(url);
   }
-  alta(url:string,body:any){
+  async alta(url:string,body:any){
     return this.httpClient.post(url,body).toPromise();
   }
+}
+
+export interface res{
+  success: boolean;
+  err: string;
 }

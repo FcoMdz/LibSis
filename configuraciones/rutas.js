@@ -34,6 +34,7 @@ router.post('/RegProd',
     body('nombre').not().isEmpty().isString(),
     body('precio').not().isEmpty().isFloat(),
     body('existencias').not().isEmpty().isInt(),
+    body('impuesto').not().isEmpty().isInt()
 ],
 (req, res) => {
     const errors = validationResult(req);
@@ -42,8 +43,39 @@ router.post('/RegProd',
         return;
     }
     let body = req.body;
-    var msg;
-    sql.query(`INSERT INTO producto VALUES ("${body.ISBN}", "${body.nombre}", ${body.precio}, ${body.existencias})`,(sqlErr, sqlRes) => {
+    sql.query(`INSERT INTO producto VALUES ("${body.ISBN}", "${body.nombre}", ${body.precio}, ${body.existencias}, ${body.impuesto})`,(sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({ array:null, 
+                    success:false, 
+                    err: JSON.stringify(sqlErr)
+                });
+            return;
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        });
+    });
+}
+);
+
+
+router.post('/ActProd', 
+[
+    body('ISBN').not().isEmpty().isString(),
+    body('nombre').not().isEmpty().isString(),
+    body('precio').not().isEmpty().isFloat(),
+    body('existencias').not().isEmpty().isInt(),
+    body('impuesto').not().isEmpty().isInt()
+],
+(req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)});
+        return;
+    }
+    let body = req.body;
+    sql.query(`UPDATE producto SET nombre="${body.nombre}", precio=${body.precio}, existencias=${body.existencias}, impuesto=${body.impuesto} WHERE ISBN="${body.ISBN}"`,(sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({ array:null, 
                     success:false, 
@@ -121,8 +153,27 @@ router.post('/CrearNV',
     });
 });
 
-router.post('/consProd',(req, res) => {
+router.get('/consProds',(req, res) => {
     sql.query(`SELECT * FROM producto`, (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message});
+            return;
+        }
+        res.send(sqlRes);
+    });
+});
+
+router.post('/consProd',
+[
+    body('ISBN').not().isEmpty().isString()
+],(req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)});
+        return;
+    }
+    let body = req.body;
+    sql.query(`SELECT * FROM producto WHERE ISBN="${body.ISBN}"`, (sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({success:false, err: sqlErr.message});
             return;
