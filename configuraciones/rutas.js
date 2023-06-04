@@ -5,7 +5,9 @@ const sql = require("./conection");
 
 router.use(express.static(process.cwd()+'/AngularProyect/dist/lib-sis/'));
 router.get('/', (req, res) => {
-    res.send({mensaje: "Hola"})
+    var link = process.cwd()+'/AngularProyect/dist/lib-sis/';
+    res.sendFile(link);
+    console.log("Enviado: " + link);
 });
 
 router.post('/RegProd', (req, res) => {
