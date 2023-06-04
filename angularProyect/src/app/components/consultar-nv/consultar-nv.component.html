@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" *ngIf=" usuario && (usuario.vendedor || usuario.admin); else iniciarSesion">
     <div class="row">
       <div class="col-12">
         <h2>CONSULTA DE LA NOTA DE VENTA</h2>
@@ -34,3 +34,9 @@
       </div>
   </div>
 
+
+  <ng-template #iniciarSesion>
+    <div class="container my-4 text-center">
+      <h1>Inicie sesión para acceder a esta página</h1>
+    </div>
+  </ng-template>

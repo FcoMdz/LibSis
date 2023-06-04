@@ -6,5 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./registrar.component.css']
 })
 export class RegistrarComponent {
+  usuario:any = sessionStorage.getItem('usuario');
 
+  constructor(){
+    if(this.usuario) this.usuario = JSON.parse(this.usuario);
+  }
 }
