@@ -4,7 +4,7 @@ const router = express.Router();
 const sql = require("./conection");
 
 router.post('/RegProd', (req, res) => {
-    
+    res.send({message:"test"});
 });
 
 router.post('/CrearNV', (req, res) => {
