@@ -1,27 +1,51 @@
-<p>login works!</p>
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <div class="card" style="width: 18rem;">
-                <div class="card-header">
-                  Ingrese los siguientes datos
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <div class="input-group">
-                            <span class="input-group-text" id="basic-addon1">Usuario:</span>
-                            <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" [(ngModel)]="usuario">
-                        </div>
-                      </li>
-                      <li class="list-group-item">
-                        <div class="input-group">
-                            <span class="input-group-text" id="basic-addon1">Contraseña:</span>
-                            <input type="text" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1" [(ngModel)]="contrasena">
-                        </div>
-                      </li>
-                </ul>
-              </div>
-        </div>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8 col-xxl-6">
+      <div class="card">
+        <div class="card-header">Ingrese los siguientes datos</div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">Usuario:</span>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Username"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                [(ngModel)]="usuario"
+              />
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">Contraseña:</span>
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Password"
+                aria-label="Password"
+                aria-describedby="basic-addon1"
+                [(ngModel)]="contrasena"
+              />
+            </div>
+          </li>
+          <li class="list-group-item text-center">
+            <button class="btn btn-lg btn-primary" (click)="login()">Iniciar Sesión</button>
+          </li>
+        </ul>
+      </div>
     </div>
+  </div>
+  <div class="row justify-content-center mt-2">
+    <div class="col-lg-10 col-xl-8 col-xxl-6 text-center">
+    <button
+      type="button"
+      class="btn btn-secondary btn-lg p-4 g-2"
+      routerLink="/"
+      >
+      Regresar
+    </button>
+    </div>
+  </div>
 </div>
-<button type="button" class="btn btn-secondary btn-lg p-4 g-2 w-100" routerLink="/">Regresar</button>
