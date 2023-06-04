@@ -18,6 +18,6 @@ CONNECTION.connect((err) =>{
         console.log("Error en la conexion con la BD", err);
         return;
     }
-    console.log("Conexión con la BD exitosa");
+    console.log("Conexión con la BD exitosa: " + DB_HOST);
 });
 module.exports = CONNECTION;
