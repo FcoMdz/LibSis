@@ -3,9 +3,9 @@ const express = require('express');
 const router = express.Router();
 const sql = require("./conection");
 
-router.use(express.static(process.cwd()+'/AngularProyect/dist/lib-sis/'))
+router.use(express.static(process.cwd()+'/AngularProyect/dist/lib-sis/'));
 router.get('/', (req, res) => {
-    var link = process.cwd()+ '/AngularProyect/dist/lib-sis/';
+    var link = './index.html';
     res.sendFile(link);
     console.log("Enviado: " + link);
 });
