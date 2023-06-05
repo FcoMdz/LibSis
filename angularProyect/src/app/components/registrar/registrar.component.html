@@ -12,16 +12,16 @@
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <div class="input-group">
-              <label class="input-group-text" for="inputGroupSelect01">Productos</label>
+              <label class="input-group-text" for="options">Productos</label>
               <select class="form-select" id="options">
-                <option value="0" selected>Nuevo prodcuto</option>
-                <option *ngFor="let prodcuto of productos" value="{{ prodcuto.ISBN }}">{{prodcuto.nombre}}</option>
+                <option value="0" selected>Nuevo producto</option>
+                <option *ngFor="let producto of productos" value="{{ producto.ISBN }}">{{producto.nombre}}</option>
               </select>
             </div>
           </li>
           <li class="list-group-item">
             <div class="input-group">
-              <span class="input-group-text" id="basic-addon1">ISBN</span>
+              <label for="isbn" class="input-group-text" id="basic-addon1" >ISBN</label>
               <input
                 type="text"
                 class="form-control"
@@ -35,7 +35,15 @@
           </li>
           <li class="list-group-item">
             <div class="input-group">
-              <span class="input-group-text" id="basic-addon1">Nombre</span>
+              <label class="input-group-text" for="editorial">Editoriales</label>
+              <select class="form-select" size="3" multiple data-live-search="true" id="editorial">
+                <option *ngFor="let editorial of editoriales" value="{{editorial.id_editorial}}">{{editorial.nombre}}</option>
+              </select>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
               <input
                 type="text"
                 class="form-control"
@@ -49,7 +57,15 @@
           </li>
           <li class="list-group-item">
             <div class="input-group">
-              <span class="input-group-text" id="basic-addon1">Precio</span>
+              <label class="input-group-text" for="autor">Autores</label>
+              <select class="form-select" size="3" multiple data-live-search="true" id="autor">
+                <option *ngFor="let autor of autores" value="{{autor.id_autor}}">{{autor.nombre}}</option>
+              </select>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label for="precio" class="input-group-text" id="basic-addon1">Precio</label>
               <input
                 type="number"
                 class="form-control"
@@ -65,7 +81,7 @@
           </li>
           <li class="list-group-item">
             <div class="input-group">
-              <span class="input-group-text" id="basic-addon1">Existencias</span>
+              <label for="cantidad" class="input-group-text" id="basic-addon1">Existencias</label>
               <input
                 type="number"
                 class="form-control"
@@ -80,7 +96,7 @@
           </li>
           <li class="list-group-item">
             <div class="input-group">
-              <span class="input-group-text" id="basic-addon1">Impuesto</span>
+              <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto</label>
               <input
                 type="number"
                 class="form-control"
@@ -96,7 +112,7 @@
         </ul>
       </div>
       <div class="text-center my-2">
-        <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg">Registrar</button>
+        <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"><i class="fa-solid fa-book"></i> Registrar <i class="fa-solid fa-book"></i></button>
       </div>
     </form>
     </div>
