@@ -1,12 +1,16 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { RegistrarComponent } from './registrar/registrar.component';
-import { CrearNVComponent } from './crear-nv/crear-nv.component';
-import { InicioComponent } from './inicio/inicio.component';
-import { ConsultarNvComponent } from './consultar-nv/consultar-nv.component';
+import { RegistrarComponent } from './components/registrar/registrar.component';
+import { CrearNVComponent } from './components/crear-nv/crear-nv.component';
+import { InicioComponent } from './components/inicio/inicio.component';
+import { ConsultarNvComponent } from './components/consultar-nv/consultar-nv.component';
+import { LoginComponent } from './components/login/login.component';
+import { FormsModule } from '@angular/forms';
+import { SQLService } from './services/sql.service';
 
 @NgModule({
   declarations: [
@@ -14,13 +18,17 @@ import { ConsultarNvComponent } from './consultar-nv/consultar-nv.component';
     RegistrarComponent,
     CrearNVComponent,
     InicioComponent,
-    ConsultarNvComponent
+    ConsultarNvComponent,
+    LoginComponent,
+
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [SQLService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

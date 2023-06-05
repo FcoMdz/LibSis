@@ -1,12 +1,22 @@
 USE railway;
-
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 04-06-2023 a las 00:27:24
--- Versión del servidor: 10.4.28-MariaDB
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS autor;
+DROP TABLE IF EXISTS cliente;
+DROP TABLE IF EXISTS detalleencargo;
+DROP TABLE IF EXISTS detallenc;
+DROP TABLE IF EXISTS detallenv;
+DROP TABLE IF EXISTS detallena;
+DROP TABLE IF EXISTS editorial;
+DROP TABLE IF EXISTS encargo;
+DROP TABLE IF EXISTS notaapartado;
+DROP TABLE IF EXISTS notacompra;
+DROP TABLE IF EXISTS notaventa;
+DROP TABLE IF EXISTS producto;
+DROP TABLE IF EXISTS productoautor;
+DROP TABLE IF EXISTS productoeditorial;
+DROP TABLE IF EXISTS proveedor;
+DROP TABLE IF EXISTS usuario;
+SET FOREIGN_KEY_CHECKS=1;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -33,6 +43,14 @@ CREATE TABLE `autor` (
   `nombre` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `autor`
+--
+
+INSERT INTO `autor` (`id_autor`, `nombre`) VALUES
+(1, 'María Gripe'),
+(2, 'Alfredo Gómez Cerdá');
+
 -- --------------------------------------------------------
 
 --
@@ -42,8 +60,15 @@ CREATE TABLE `autor` (
 CREATE TABLE `cliente` (
   `id_cte` int(10) NOT NULL,
   `Nombre` varchar(255) NOT NULL,
-  `Telefono` int(13) DEFAULT NULL
+  `Telefono` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `cliente`
+--
+
+INSERT INTO `cliente` (`id_cte`, `Nombre`, `Telefono`) VALUES
+(1, 'Gerardo Femat Delgado', 4494122838);
 
 -- --------------------------------------------------------
 
@@ -55,7 +80,7 @@ CREATE TABLE `detalleencargo` (
   `cantidadProducto` int(10) NOT NULL,
   `impuestoProducto` float NOT NULL,
   `precioProducto` float NOT NULL,
-  `productoISBN` varchar(14) NOT NULL,
+  `productoISBN` varchar(18) NOT NULL,
   `encargoFolioEncargo` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -69,7 +94,7 @@ CREATE TABLE `detallena` (
   `precioProducto` float NOT NULL,
   `cantidadProducto` int(11) NOT NULL,
   `impuestoProducto` float NOT NULL,
-  `productoISBN` varchar(14) NOT NULL,
+  `productoISBN` varchar(18) NOT NULL,
   `notaApartadoFolioNA` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -80,7 +105,7 @@ CREATE TABLE `detallena` (
 --
 
 CREATE TABLE `detallenc` (
-  `productoISBN` varchar(14) NOT NULL,
+  `productoISBN` varchar(18) NOT NULL,
   `notaCompraFolioNC` int(10) NOT NULL,
   `precioProducto` float NOT NULL,
   `cantidadProducto` int(11) NOT NULL,
@@ -97,7 +122,7 @@ CREATE TABLE `detallenv` (
   `precioProducto` float NOT NULL,
   `cantidadProdcuto` int(10) NOT NULL,
   `impuesto` float NOT NULL,
-  `productoISBN` varchar(14) NOT NULL,
+  `productoISBN` varchar(18) NOT NULL,
   `notaVentaFolioNV` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -110,8 +135,16 @@ CREATE TABLE `detallenv` (
 CREATE TABLE `editorial` (
   `id_editorial` int(10) NOT NULL,
   `nombre` varchar(255) NOT NULL,
-  `telefono` int(12) NOT NULL
+  `telefono` bigint(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `editorial`
+--
+
+INSERT INTO `editorial` (`id_editorial`, `nombre`, `telefono`) VALUES
+(1, 'Ediciones SM', 5510878484),
+(2, 'Grupo Planeta', 34934928000);
 
 -- --------------------------------------------------------
 
@@ -169,11 +202,19 @@ CREATE TABLE `notaventa` (
 --
 
 CREATE TABLE `producto` (
-  `ISBN` varchar(13) NOT NULL,
+  `ISBN` varchar(18) NOT NULL,
   `nombre` varchar(255) NOT NULL,
   `precio` float NOT NULL,
-  `existencias` int(11) NOT NULL
+  `existencias` int(11) NOT NULL,
+  `impuesto` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `producto`
+--
+
+INSERT INTO `producto` (`ISBN`, `nombre`, `precio`, `existencias`, `impuesto`) VALUES
+('978-970-785-446-8', 'La casa de verano', 120.99, 4, 0);
 
 -- --------------------------------------------------------
 
@@ -183,7 +224,7 @@ CREATE TABLE `producto` (
 
 CREATE TABLE `productoautor` (
   `autorIdAutor` int(10) NOT NULL,
-  `productoISBN` varchar(14) NOT NULL
+  `productoISBN` varchar(18) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -194,7 +235,7 @@ CREATE TABLE `productoautor` (
 
 CREATE TABLE `productoeditorial` (
   `editorialIdEditorial` int(10) NOT NULL,
-  `productoISBN` varchar(14) NOT NULL
+  `productoISBN` varchar(18) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -206,7 +247,7 @@ CREATE TABLE `productoeditorial` (
 CREATE TABLE `proveedor` (
   `id_proveedor` int(10) NOT NULL,
   `nombre` varchar(255) NOT NULL,
-  `telefono` int(13) NOT NULL,
+  `telefono` bigint(13) NOT NULL,
   `RFC` varchar(13) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -226,6 +267,13 @@ CREATE TABLE `usuario` (
   `enccompras` tinyint(1) NOT NULL,
   `administrador` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`usuario`, `nombre`, `contrasena`, `vendedor`, `almacenista`, `cajero`, `enccompras`, `administrador`) VALUES
+('Admin', 'Administrador General', '123456789', 1, 1, 1, 1, 1);
 
 --
 -- Índices para tablas volcadas
@@ -346,19 +394,19 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `autor`
 --
 ALTER TABLE `autor`
-  MODIFY `id_autor` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_autor` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id_cte` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_cte` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `editorial`
 --
 ALTER TABLE `editorial`
-  MODIFY `id_editorial` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_editorial` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `encargo`
@@ -382,7 +430,7 @@ ALTER TABLE `notacompra`
 -- AUTO_INCREMENT de la tabla `notaventa`
 --
 ALTER TABLE `notaventa`
-  MODIFY `folioNV` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `folioNV` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedor`

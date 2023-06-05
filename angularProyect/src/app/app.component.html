@@ -1,2 +1,22 @@
-<h1 class="text-center my-1">Librería el Cambiazo</h1>
-<router-outlet></router-outlet>
+<nav class="navbar bg-dark border-bottom border-bottom-dark" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/"><h2>El Cambiazo</h2></a>
+    <div class="btn-group">
+      <button id="inicioSesion" type="button" class="btn btn-outline-light ms-lg-2 mt-2 mt-lg-0" routerLink="/login">
+        <i class="fa-solid fa-user"></i> Iniciar Sesión
+      </button>
+      <button type="button" class="btn btn-outline-light dropdown-toggle dropdown-toggle-split me-2 me-md-0 mt-2 mt-lg-0" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="visually-hidden">Toggle Dropdown</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
+        <li>
+          <button id="cerrarSesion" class="dropdown-item" disabled routerLink="/login" (click)="cerrarSesion()" >Cerrar sesión</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="my-4">
+  <router-outlet (activate)="suscribeToEmmiter($event)" (deactivate)="suscribeToEmmiter($event)"></router-outlet>
+</div>
+

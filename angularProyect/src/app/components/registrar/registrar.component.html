@@ -1,0 +1,126 @@
+<div class="container" *ngIf=" usuario && (usuario.vendedor || usuario.admin); else iniciarSesion">
+  <div class="row text-center">
+    <div class="col-12">
+      <h2>REGISTRO DE PRODUCTOS</h2>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8 col-xxl-6">
+      <form>
+      <div class="card">
+        <div class="card-header">Ingrese los siguientes datos</div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <div class="input-group">
+              <label class="input-group-text" for="options">Productos</label>
+              <select class="form-select" id="options">
+                <option value="0" selected>Nuevo producto</option>
+                <option *ngFor="let producto of productos" value="{{ producto.ISBN }}">{{producto.nombre}}</option>
+              </select>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label for="isbn" class="input-group-text" id="basic-addon1" >ISBN</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="xxx-x-xx-xxxxxx-x"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                id="isbn"
+                required
+              />
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label class="input-group-text" for="editorial">Editoriales</label>
+              <select class="form-select" size="3" multiple data-live-search="true" id="editorial">
+                <option *ngFor="let editorial of editoriales" value="{{editorial.id_editorial}}">{{editorial.nombre}}</option>
+              </select>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Nombre producto"
+                aria-label="Nombre producto"
+                aria-describedby="basic-addon1"
+                id="nombre"
+                required
+              />
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label class="input-group-text" for="autor">Autores</label>
+              <select class="form-select" size="3" multiple data-live-search="true" id="autor">
+                <option *ngFor="let autor of autores" value="{{autor.id_autor}}">{{autor.nombre}}</option>
+              </select>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label for="precio" class="input-group-text" id="basic-addon1">Precio</label>
+              <input
+                type="number"
+                class="form-control"
+                step=".01"
+                placeholder="$000.00"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                id="precio"
+                min="0"
+                required
+              />
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label for="cantidad" class="input-group-text" id="basic-addon1">Existencias</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Ej. 1"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                id="cantidad"
+                required
+                min="0"
+              />
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
+              <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Ej. 5"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                id="impuesto"
+                required
+                min="0"
+              />
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="text-center my-2">
+        <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"><i class="fa-solid fa-book"></i> Registrar <i class="fa-solid fa-book"></i></button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+<ng-template #iniciarSesion>
+  <div class="container my-4 text-center">
+    <h1>Inicie sesión para acceder a esta página</h1>
+  </div>
+</ng-template>
