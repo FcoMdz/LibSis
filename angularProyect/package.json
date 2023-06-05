@@ -19,6 +19,7 @@
     "@angular/platform-browser-dynamic": "^16.0.0",
     "@angular/router": "^16.0.0",
     "accessibility": "^4.5.7",
+    "angular-cli-ghpages": "^1.0.6",
     "bootstrap": "^5.3.0",
     "jquery": "^3.7.0",
     "rxjs": "~7.8.0",
