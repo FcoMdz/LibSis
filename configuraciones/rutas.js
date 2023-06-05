@@ -18,9 +18,11 @@ router.post('/login',
     let q = `SELECT nombre, vendedor, almacenista, cajero, enccompras, administrador FROM usuario WHERE usuario="${body.usuario}" AND contrasena="${body.contrasena}"`;
     sql.query(q, (sqlErr, sqlRes) => {
         if(sqlErr){
+            console.log(sqlErr);
             res.send({success:false, err: sqlErr.message});
             return;
         }else if(sqlRes.length == 0){
+            console.log(sqlRes);
             res.send({success:false});
             return;
         }
