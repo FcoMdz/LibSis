@@ -26,7 +26,7 @@ router.post('/login',
         }
         res.send(sqlRes[0]);
     });
-});
+
 
 router.post('/RegProd', 
 [
