@@ -195,7 +195,7 @@ router.post('/CrearNV',
             var d = new Date();
             d.setTime(d.getTime() - (/* UTC-6 */ 6) * 60 * 60 * 1000);
             fecha = d.toISOString().split("T")[0];
-            sql.query(`INSERT INTO notaVenta (fechaVenta, clienteId_cte) VALUES ("${fecha}", ${body.idCte})`, (sqlErr, sqlRes) => {
+            sql.query(`INSERT INTO notaventa (fechaVenta, clienteId_cte) VALUES ("${fecha}", ${body.idCte})`, (sqlErr, sqlRes) => {
                 if(sqlErr){
                     console.log(sqlErr);
                     res.send({ array:null, 
