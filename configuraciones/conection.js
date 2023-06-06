@@ -14,11 +14,13 @@ const CONNECTION = mysql.createPool({
     connectionLimit: 20,
     enableKeepAlive: true
 });
-CONNECTION.connect((err) =>{
+CONNECTION.getConnection((err, conn) => {
     if(err){
         console.log("Error en la conexion con la BD", err);
         return;
     }
     console.log("Conexión con la BD exitosa: " + DB_HOST);
+    CONNECTION.releaseConnection(conn);
 });
+
 module.exports = CONNECTION;
