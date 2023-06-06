@@ -5,12 +5,14 @@ const DB_PASSWD = process.env.DB_PASSWD || "Pakwarrior10";
 const DB_NAME = process.env.DB_NAME || "libreria";
 const DB_PORT = process.env.DB_PORT || "3306";
 
-const CONNECTION = mysql.createConnection({
+const CONNECTION = mysql.createPool({
     host: DB_HOST,
     user: DB_USER,
     password: DB_PASSWD,
     database: DB_NAME,
-    port: DB_PORT
+    port: DB_PORT,
+    connectionLimit: 20,
+    enableKeepAlive: true
 });
 CONNECTION.connect((err) =>{
     if(err){
