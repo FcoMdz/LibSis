@@ -4,7 +4,7 @@ import {HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class SQLService {
-  public URL:string = "https://libsistest-production.up.railway.app"
+  public URL:string = "http://localhost:3000"
   constructor(private httpClient:HttpClient) { }
   async consulta(url:string){
     return this.httpClient.get(url);
