@@ -6,6 +6,10 @@ const DB_NAME = process.env.DB_NAME || "libreria";
 const DB_PORT = process.env.DB_PORT || "3306";
 
 const CONNECTION = mysql.createPool({
+const DB_PASSWD = process.env.DB_PASSWD || "";
+const DB_NAME = process.env.DB_NAME || "libreria";
+const DB_PORT = process.env.DB_PORT || "3306";
+const CONNECTION = mysql.createConnection({
     host: DB_HOST,
     user: DB_USER,
     password: DB_PASSWD,
@@ -13,6 +17,7 @@ const CONNECTION = mysql.createPool({
     port: DB_PORT,
     connectionLimit: 20,
     enableKeepAlive: true
+    port: DB_PORT
 });
 CONNECTION.getConnection((err, conn) => {
     if(err){
