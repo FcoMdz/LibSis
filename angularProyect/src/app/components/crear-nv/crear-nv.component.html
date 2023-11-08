@@ -1,0 +1,196 @@
+<div class="container" *ngIf=" usuario && (usuario.vendedor || usuario.admin); else iniciarSesion">
+  <div class="row text-center">
+    <div class="col-12">
+      <h2>REGISTRAR NOTA DE VENTA</h2>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8 col-xxl-6 mb-3 mb-lg-0">
+        <div class="card">
+          <div class="card-header">
+            Ingrese los siguientes datos
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="clientes">Clientes</label>
+                  <select class="form-select" id="clientes">
+                    <option value="0" selected>Selecciona un cliente</option>
+                    <option *ngFor="let cliente of clientes" value="{{ cliente.id_cte }}">{{cliente.Nombre}}</option>
+                  </select>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="options">Productos</label>
+                  <select class="form-select" id="options">
+                    <option value="0" selected>Selecciona un producto</option>
+                    <option *ngFor="let producto of productos" value="{{ producto.ISBN }}">{{producto.nombre}}</option>
+                  </select>
+                  </div>
+              </li>
+              
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="precio" id="basic-addon1">Precio $</label>
+                  <input
+                    id="precio"
+                    type="text"
+                    class="form-control"
+                    placeholder="000.00"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                    step=".01"
+                    disabled
+                  />
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto %</label>
+                  <input
+                    id="impuesto"
+                    type="text"
+                    class="form-control"
+                    placeholder="000.00"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                    step=".01"
+                    disabled
+                  />
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" id="basic-addon1">Existencias</label>
+                  <input
+                    type="number"
+                    min="0"
+                    class="form-control"
+                    placeholder="Ej. 1"
+                    aria-label="Username"
+                    [value]="existencias"
+                    disabled
+                    aria-describedby="basic-addon1"
+                  />
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label for="cant" class="input-group-text" id="basic-addon1">Cantidad</label>
+                  <input
+                    id="cant"
+                    type="number"
+                    [(ngModel)]="cantidad"
+                    max="{{cantidadMax}}"
+                    min="0"
+                    class="form-control"
+                    placeholder="Ej. 1"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                  />
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="card-footer text-center">
+            <div class="row">
+              <div class="col-6"><button class="btn btn-outline-primary" style="width: 100%;" (click)="agregarProducto()"><i class="fa-solid fa-circle-plus"></i> Agregar <i class="fa-solid fa-circle-plus"></i></button></div>
+              <div class="col-6"><button class="btn btn-outline-success" style="width: 100%;" (click)="cargarNV()"><i class="fa-solid fa-receipt"></i> Registrar <i class="fa-solid fa-receipt"></i></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-10 col-xl-8 col-xxl-6">
+        <div class="card">
+          <div class="card-body table-responsive">
+            <table class="table table-dark table-striped">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Precio</th>
+                  <th>Impuesto</th>
+                  <th>Cantidad</th>
+                  <th>Quitar</th>
+                </tr>
+                </thead>
+              <tbody class="text-center">
+                <tr *ngFor="let datos of campos">
+                  <td>
+                    {{datos.nombre}}
+                  </td>
+                  <td>
+                    ${{datos.precio}}
+                  </td>
+                  <td>
+                    ${{datos.impuesto}}
+                  </td>
+                  <td>
+                    {{datos.cantidad}}
+                  </td>
+                  <td>
+                    <i class="fa-regular fa-trash-can" (click)="reducir(datos)" style="cursor: pointer;"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-body">
+            <div class="input-group my-2">
+              <label class="input-group-text" for="subtotal">Subtotal $</label>
+              <input
+                id="subtotal"
+                type="number"
+                class="form-control"
+                placeholder="$000.00"
+                step=".01"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                [value]="subtotal"
+                disabled
+              />
+            </div>
+            <div class="input-group my-2">
+              <label class="input-group-text" for="imp">Impuestos $</label>
+              <input
+                id="imp"
+                type="number"
+                class="form-control"
+                placeholder="$000.00"
+                step=".01"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                [value]="impuestosTotal"
+                disabled
+              />
+            </div>
+            <div class="input-group my-2">
+              <label class="input-group-text" for="total">Total $</label>
+              <input
+                id="total"
+                type="number"
+                class="form-control"
+                placeholder="$000.00"
+                step=".01"
+                aria-label="Username"
+                aria-describedby="basic-addon1"
+                [value]="total"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<ng-template #iniciarSesion>
+  <div class="container my-4 text-center">
+    <h1>Inicie sesión para acceder a esta página</h1>
+  </div>
+</ng-template>
