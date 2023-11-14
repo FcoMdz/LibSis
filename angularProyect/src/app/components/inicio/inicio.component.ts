@@ -37,12 +37,13 @@ export class InicioComponent implements OnInit{
     this.ventas.style.display = "none";
     this.clientes.style.display = "none";
     this.compras.style.display = "none"
-    if(this.usuario.administrador) console.log(this.usuario.administrador)
-    this.iniciarSesion.style.display = "none";
-    if(this.usuario.administrador) this.administracion.style.display = "block";
-    if(this.usuario.vendedor || this.usuario.administrador) this.ventas.style.display = "block";
-    if(this.usuario.vendedor || this.usuario.administrador) this.clientes.style.display = "block";
-    if(this.usuario.almacenista || this.usuario.administrador) this.compras.style.display = "block";
+    if(Object.keys(this.usuario).length != 0){
+      this.iniciarSesion.style.display = "none";
+      if(this.usuario.administrador) this.administracion.style.display = "block";
+      if(this.usuario.vendedor || this.usuario.administrador) this.ventas.style.display = "block";
+      if(this.usuario.vendedor || this.usuario.administrador) this.clientes.style.display = "block";
+      if(this.usuario.almacenista || this.usuario.administrador) this.compras.style.display = "block";
+    }
   }
 
 }
