@@ -14,11 +14,11 @@ export class LoginComponent {
   usuario!:string;
   contrasena!:string;
   loginEvent = new EventEmitter();
-
   constructor(private SqlService:SQLService, private router:Router){
 
   }
   login(){
+    console.log(this.usuario + " - " + this.contrasena);
     let body = {
       usuario: this.usuario,
       contrasena: this.contrasena
