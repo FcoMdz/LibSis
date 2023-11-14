@@ -4,14 +4,37 @@
       <div class="col p-1" id="IniciarSesion">
         <button type="button" class="btn btn-primary btn-lg p-4 g-2 w-100 option" routerLink="/login">Iniciar Sesion</button>
       </div>
-      <div class="col p-1" id="RegProd">
-         <button type="button" class="btn btn-success btn-lg p-4 g-2 w-100 option" routerLink="/RegProd">Registrar producto</button>
+    </div>
+    <div class="hidden mt-4">
+      <div class="col-12 p-1">
+        <h1 class="text-center">Administración</h1>
       </div>
-      <div class="col p-1" id="RegNV">
-        <button type="button" class="btn btn-warning btn-lg p-4 g-2 w-100 option" routerLink="/CrearNV">Crear Nota de venta</button>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-evenly">
+        <div class="col p-1" id="RegProd">
+           <button type="button" class="btn green hover btn-lg p-4 g-2 w-100 option" routerLink="/RegProd">Registrar producto</button>
+        </div>
+        <div class="col p-1" id="RegNV">
+          <button type="button" class="btn yellow hover btn-lg p-4 g-2 w-100 option" routerLink="/CrearNV">Crear Nota de venta</button>
+        </div>
+        <div class="col p-1" id="ConsNV">
+          <button type="button" class="btn red hover btn-lg p-4 g-2 w-100 option" routerLink="/ConsNV">Consultar Nota de venta</button>
+        </div>
       </div>
-      <div class="col p-1" id="ConsNV">
-        <button type="button" class="btn btn-danger btn-lg p-4 g-2 w-100 option" routerLink="/ConsNV">Consultar Nota de venta</button>
+    </div>
+    <div class="hidden mt-4">
+      <div class="col-12 p-1">
+        <h1 class="text-center">Ventas</h1>
+      </div>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-evenly">
+        <div class="col p-1" id="RegNV">
+          <button type="button" class="btn yellow hover btn-lg p-4 g-2 w-100 option" routerLink="/CrearNV">Crear nota de venta</button>
+        </div>
+        <div class="col p-1" id="RegProd">
+           <button type="button" class="btn green hover btn-lg p-4 g-2 w-100 option" routerLink="/">Editar nota de venta</button>
+        </div>
+        <div class="col p-1" id="ConsNV">
+          <button type="button" class="btn red hover btn-lg p-4 g-2 w-100 option" routerLink="/ConsNV">Consultar nota de venta</button>
+        </div>
       </div>
     </div>
   </div>

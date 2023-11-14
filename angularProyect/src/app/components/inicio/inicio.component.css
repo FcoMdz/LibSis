@@ -8,3 +8,48 @@
 .inicio{
   padding-top: 10vh;
 }
+
+.hover{
+ transition: all 250ms;
+}
+
+.hover:hover{
+  transform: scale(1.02);
+}
+
+.red{
+  background-color: #FA8A6B;
+}
+
+.blue{
+  background-color: #6B8CFA;
+}
+
+.green{
+  background-color: #B9FA6B;
+}
+
+.turquoise{
+  background-color: #76FAF2;
+}
+
+.pink{
+  background-color: #FA75E6;
+}
+
+.yellow{
+  background-color: #FAE175;
+}
+
+.menta{
+  background-color: #75FAB4;
+}
+
+.orange{
+  background-color: #FACC75;
+}
+
+.purple{
+  background-color: #CA75FA;
+}
+
