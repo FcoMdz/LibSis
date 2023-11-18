@@ -6,115 +6,144 @@
   </div>
   <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-8 col-xxl-6">
-      <form>
-      <div class="card">
-        <div class="card-header">Ingrese los siguientes datos</div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            <div class="input-group">
-              <label class="input-group-text" for="options">Productos</label>
-              <select class="form-select" id="options">
-                <option value="0" selected>Nuevo producto</option>
-                <option *ngFor="let producto of productos" value="{{ producto.ISBN }}">{{producto.nombre}}</option>
-              </select>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="input-group">
-              <label for="isbn" class="input-group-text" id="basic-addon1" >ISBN</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="xxx-x-xx-xxxxxx-x"
-                aria-label="Username"
-                aria-describedby="basic-addon1"
-                id="isbn"
-                required
-              />
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="input-group">
-              <label class="input-group-text" for="editorial">Editoriales</label>
-              <select class="form-select" size="3" multiple data-live-search="true" id="editorial">
-                <option *ngFor="let editorial of editoriales" value="{{editorial.id_editorial}}">{{editorial.nombre}}</option>
-              </select>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="input-group">
-              <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Nombre producto"
-                aria-label="Nombre producto"
-                aria-describedby="basic-addon1"
-                id="nombre"
-                required
-              />
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="input-group">
-              <label class="input-group-text" for="autor">Autores</label>
-              <select class="form-select" size="3" multiple data-live-search="true" id="autor">
-                <option *ngFor="let autor of autores" value="{{autor.id_autor}}">{{autor.nombre}}</option>
-              </select>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="input-group">
-              <label for="precio" class="input-group-text" id="basic-addon1">Precio</label>
-              <input
-                type="number"
-                class="form-control"
-                step=".01"
-                placeholder="$000.00"
-                aria-label="Username"
-                aria-describedby="basic-addon1"
-                id="precio"
-                min="0"
-                required
-              />
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="input-group">
-              <label for="cantidad" class="input-group-text" id="basic-addon1">Existencias</label>
-              <input
-                type="number"
-                class="form-control"
-                placeholder="Ej. 1"
-                aria-label="Username"
-                aria-describedby="basic-addon1"
-                id="cantidad"
-                required
-                min="0"
-              />
-            </div>
-          </li>
-          <li class="list-group-item">
-            <div class="input-group">
-              <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto</label>
-              <input
-                type="number"
-                class="form-control"
-                placeholder="Ej. 5"
-                aria-label="Username"
-                aria-describedby="basic-addon1"
-                id="impuesto"
-                required
-                min="0"
-              />
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="text-center my-2">
-        <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"><i class="fa-solid fa-book"></i> Registrar <i class="fa-solid fa-book"></i></button>
-      </div>
-    </form>
+      <form [formGroup]="formUser">
+        <div class="card">
+          <div class="card-header">Ingrese los siguientes datos</div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="input-group">
+                <label class="input-group-text" for="options">Productos</label>
+                <select class="form-select" id="options">
+                  <option value="0" selected>Nuevo producto</option>
+                  <option *ngFor="let producto of productos" value="{{ producto.ISBN }}">{{producto.nombre}}</option>
+                </select>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="input-group">
+                <label for="isbn" class="input-group-text" id="basic-addon1">ISBN</label>
+                <input type="text" class="form-control" formControlName="isbn" placeholder="xxx-x-xx-xxxxxx-x"
+                  aria-label="Username" aria-describedby="basic-addon1" id="isbn" required />
+              </div>
+
+              <div class="alert alert-danger mt-2"
+                [hidden]="formUser.get('isbn')?.valid || formUser.get('isbn')?.pristine">
+                <span *ngIf="formUser.get('isbn')?.errors?.['required']">
+                  El ISBN es requerido. <br>
+                </span>
+                <span *ngIf="formUser.get('isbn')?.errors?.['minlength']">
+                  El ISBN debe de ser de 13 numeros, te faltan {{ 13 - ISBN.value.length }}. <br>
+                </span>
+
+                <span *ngIf="formUser.get('isbn')?.errors?.['maxlength']">
+                  El ISBN debe de ser de 13 numeros, te sobran {{ ISBN.value.length - 13 }}. <br>
+                </span>
+
+                <span *ngIf="formUser.get('isbn')?.errors?.['pattern']">
+                  EL ISBN solo puede tener numeros.
+                </span>
+              </div>
+
+            </li>
+            <li class="list-group-item">
+              <div class="input-group">
+                <label class="input-group-text" for="editorial">Editoriales</label>
+                <select class="form-select form-control" size="3" multiple data-live-search="true" id="editorial">
+                  <option *ngFor="let editorial of editoriales" value="{{editorial.id_editorial}}">{{editorial.nombre}}
+                  </option>
+                </select>
+              </div>
+
+            </li>
+            <li class="list-group-item">
+              <div class="input-group">
+                <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
+                <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre producto"
+                  aria-label="Nombre producto" aria-describedby="basic-addon1" id="nombre" required />
+              </div>
+
+              <div class="alert alert-danger mt-2"
+                [hidden]="formUser.get('nombre')?.valid || formUser.get('nombre')?.pristine">
+                <span *ngIf="formUser.get('nombre')?.errors?.['required']">
+                  El nombre es requerido.
+                </span>
+              </div>
+
+            </li>
+            <li class="list-group-item">
+              <div class="input-group">
+                <label class="input-group-text" for="autor">Autores</label>
+                <select class="form-select form-control" size="3" multiple data-live-search="true" id="autor">
+                  <option *ngFor="let autor of autores" value="{{autor.id_autor}}">{{autor.nombre}}</option>
+                </select>
+              </div>
+
+            </li>
+            <li class="list-group-item">
+              <div class="input-group">
+                <label for="precio" class="input-group-text" id="basic-addon1">Precio</label>
+                <input type="text" class="form-control" formControlName="precio" placeholder="$000.00"
+                  aria-label="Username" aria-describedby="basic-addon1" id="precio" required />
+              </div>
+
+              <div class="alert alert-danger mt-2"
+                [hidden]="formUser.get('precio')?.valid || formUser.get('precio')?.pristine">
+                <span *ngIf="formUser.get('precio')?.errors?.['required']">
+                  El precio es requerido.
+                </span>
+
+                <span *ngIf="formUser.get('precio')?.errors?.['pattern']">
+                  El precio solo puede tener numeros.
+                </span>
+              </div>
+
+            </li>
+            <li class="list-group-item">
+              <div class="input-group">
+                <label for="cantidad" class="input-group-text" id="basic-addon1">Existencias</label>
+                <input type="text" class="form-control" formControlName="existencias" placeholder="Ej. 1"
+                  aria-label="Username" aria-describedby="basic-addon1" id="cantidad" required />
+              </div>
+
+              <div class="alert alert-danger mt-2"
+                [hidden]="formUser.get('existencias')?.valid || formUser.get('existencias')?.pristine">
+                <span *ngIf="formUser.get('existencias')?.errors?.['required']">
+                  El numero de elementos en existencia es requerido.
+                </span>
+
+                <span *ngIf="formUser.get('existencias')?.errors?.['pattern']">
+                  El numero de elementos en existencia solo puede tener numeros.
+                </span>
+              </div>
+
+            </li>
+            <li class="list-group-item">
+              <div class="input-group">
+                <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto</label>
+                <input type="text" class="form-control" formControlName="impuesto" placeholder="Ej. 5"
+                  aria-label="Username" aria-describedby="basic-addon1" id="impuesto" required />
+              </div>
+
+              <div class="alert alert-danger mt-2"
+                [hidden]="formUser.get('impuesto')?.valid || formUser.get('impuesto')?.pristine">
+                <span *ngIf="formUser.get('impuesto')?.errors?.['required']">
+                  El impuesto es requerido.
+                </span>
+
+                <span *ngIf="formUser.get('impuesto')?.errors?.['pattern']">
+                  El impuesto solo puede tener numeros.
+                </span>
+              </div>
+
+            </li>
+          </ul>
+        </div>
+        <div class="text-center my-2">
+          <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"
+            [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar <i
+              class="fa-solid fa-book"></i></button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
