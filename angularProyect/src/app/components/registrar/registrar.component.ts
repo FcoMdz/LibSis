@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SQLService, res } from 'src/app/services/sql.service';
+import { FormControl, Validators, FormGroup } from "@angular/forms";
 import Swal from 'sweetalert2';
 
 @Component({
@@ -7,28 +8,36 @@ import Swal from 'sweetalert2';
   templateUrl: './registrar.component.html',
   styleUrls: ['./registrar.component.css']
 })
-export class RegistrarComponent implements OnInit{
-  usuario:any = sessionStorage.getItem('usuario');
-  options!:HTMLSelectElement;
-  ISBN!:HTMLInputElement;
-  nombre!:HTMLInputElement;
-  precio!:HTMLInputElement;
-  cantidad!:HTMLInputElement;
-  impuesto!:HTMLInputElement;
-  btnReg!:HTMLButtonElement;
-  editorial!:HTMLSelectElement;
-  autor!:HTMLSelectElement;
-  productos!:any;
-  editoriales!:any;
-  autores!:any;
-  editorialesSelected:any[] = [];
-  autoresSelected:any[] = [];
-  editorialesPreSelected:any[] = [];
-  autoresPreSelected:any[] = [];
-  existencias:number = 0;
+export class RegistrarComponent implements OnInit {
+  usuario: any = sessionStorage.getItem('usuario');
+  options!: HTMLSelectElement;
+  ISBN!: HTMLInputElement;
+  nombre!: HTMLInputElement;
+  precio!: HTMLInputElement;
+  cantidad!: HTMLInputElement;
+  impuesto!: HTMLInputElement;
+  btnReg!: HTMLButtonElement;
+  editorial!: HTMLSelectElement;
+  autor!: HTMLSelectElement;
+  productos!: any;
+  editoriales!: any;
+  autores!: any;
+  editorialesSelected: any[] = [];
+  autoresSelected: any[] = [];
+  editorialesPreSelected: any[] = [];
+  autoresPreSelected: any[] = [];
+  existencias: number = 0;
 
-  constructor(private sql:SQLService){
-    if(this.usuario) this.usuario = JSON.parse(this.usuario);
+  formUser = new FormGroup({
+    'isbn': new FormControl('', [Validators.required, Validators.minLength(13), Validators.maxLength(13), Validators.pattern('^[0-9]*$')]),
+    'nombre': new FormControl('', [Validators.required]),
+    'precio': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
+    'existencias': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
+    'impuesto': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
+  });
+
+  constructor(private sql: SQLService) {
+    if (this.usuario) this.usuario = JSON.parse(this.usuario);
   }
 
   async ngOnInit(): Promise<void> {
@@ -45,13 +54,13 @@ export class RegistrarComponent implements OnInit{
     this.initListeners();
   }
 
-  async getData(){
+  async getData() {
     await this.consProductos();
     await this.consEditoriales();
     await this.consAutores();
   }
 
-  limpiarFormulario(){
+  limpiarFormulario() {
     this.ISBN.removeAttribute('disabled');
     this.ISBN.value = "";
     this.nombre.value = "";
@@ -65,14 +74,17 @@ export class RegistrarComponent implements OnInit{
     this.editorialesSelected = [];
     this.autoresSelected = [];
     this.existencias = 0;
+    this.btnReg.disabled = true;
   }
 
-  loadProducto(datosProducto:any){
+  loadProducto(datosProducto: any) {
     let datos = <datosProducto>datosProducto;
     let producto = datos.producto;
     this.autoresPreSelected = datos.autores;
     this.editorialesPreSelected = datos.editoriales;
-    if(producto){
+    if (producto) {
+      this.btnReg.disabled = false;
+
       this.ISBN.disabled = true;
       this.ISBN.value = producto.ISBN;
       this.nombre.value = producto.nombre;
@@ -88,7 +100,7 @@ export class RegistrarComponent implements OnInit{
         element.selected = false;
         for (let j = 0; j < this.autoresPreSelected.length; j++) {
           const apl = this.autoresPreSelected[j];
-          if(apl.autorIdAutor == element.value){
+          if (apl.autorIdAutor == element.value) {
             this.autoresSelected.push(element.value);
             element.selected = true;
           }
@@ -100,7 +112,7 @@ export class RegistrarComponent implements OnInit{
         element.selected = false;
         for (let j = 0; j < this.editorialesPreSelected.length; j++) {
           const apl = this.editorialesPreSelected[j];
-          if(apl.editorialIdEditorial == element.value){
+          if (apl.editorialIdEditorial == element.value) {
             this.editorialesSelected.push(element.value);
             element.selected = true;
           }
@@ -109,17 +121,17 @@ export class RegistrarComponent implements OnInit{
     }
   }
 
-  initListeners(){
-    this.options.addEventListener('change',(event) => {
-      if(this.options.value != "0"){
+  initListeners() {
+    this.options.addEventListener('change', (event) => {
+      if (this.options.value != "0") {
         let body = {
-          ISBN:this.options.value
+          ISBN: this.options.value
         }
-        this.sql.alta(this.sql.URL+"/consProd",body)
-        .then((datosProducto) => {
-          this.loadProducto(datosProducto);
-        });
-      }else{
+        this.sql.alta(this.sql.URL + "/consProd", body)
+          .then((datosProducto) => {
+            this.loadProducto(datosProducto);
+          });
+      } else {
         this.limpiarFormulario();
       }
     });
@@ -133,16 +145,16 @@ export class RegistrarComponent implements OnInit{
     });
   }
 
-  changeSelections(selection:HTMLSelectElement, array:any[]){
+  changeSelections(selection: HTMLSelectElement, array: any[]) {
     for (let i = 0; i < selection.options.length; i++) {
       const element = selection.options[i];
-      if(element.selected){
+      if (element.selected) {
         array.push(element.value);
       }
     }
   }
 
-  deleteSelections(selection:HTMLSelectElement, array:any[]){
+  deleteSelections(selection: HTMLSelectElement, array: any[]) {
     array = [];
     for (let i = 0; i < selection.options.length; i++) {
       const element = selection.options[i];
@@ -150,36 +162,36 @@ export class RegistrarComponent implements OnInit{
     }
   }
 
-  async consProductos(){
-    let consulta = await this.sql.consulta(this.sql.URL+"/consProds")
-    consulta.forEach((producto)=>{
+  async consProductos() {
+    let consulta = await this.sql.consulta(this.sql.URL + "/consProds")
+    consulta.forEach((producto) => {
       this.productos = producto;
     });
   }
 
-  async consAutores(){
-    let consulta = await this.sql.consulta(this.sql.URL+"/consAutores")
-    consulta.forEach((autores)=>{
+  async consAutores() {
+    let consulta = await this.sql.consulta(this.sql.URL + "/consAutores")
+    consulta.forEach((autores) => {
       this.autores = autores;
     });
   }
 
-  async consEditoriales(){
-    let consulta = await this.sql.consulta(this.sql.URL+"/consEditoriales")
-    consulta.forEach((editoriales)=>{
+  async consEditoriales() {
+    let consulta = await this.sql.consulta(this.sql.URL + "/consEditoriales")
+    consulta.forEach((editoriales) => {
       this.editoriales = editoriales;
     });
   }
 
-  registrarProducto(){
-    if(Number(this.cantidad.value) < this.existencias){
-      Swal.fire('Cantidad','La cantidad ingresada es menor que las existencias actuales','error')
+  registrarProducto() {
+    if (Number(this.cantidad.value) < this.existencias) {
+      Swal.fire('Cantidad', 'La cantidad ingresada es menor que las existencias actuales', 'error')
       return;
     }
-    let autores:any[]|null = this.autoresSelected;
-    let editoriales:any[]|null = this.editorialesSelected;
-    if(this.autoresSelected.length == 0) autores = null;
-    if(this.editorialesSelected.length == 0) editoriales = null;
+    let autores: any[] | null = this.autoresSelected;
+    let editoriales: any[] | null = this.editorialesSelected;
+    if (this.autoresSelected.length == 0) autores = null;
+    if (this.editorialesSelected.length == 0) editoriales = null;
     let body = {
       ISBN: this.ISBN.value,
       nombre: this.nombre.value,
@@ -189,45 +201,49 @@ export class RegistrarComponent implements OnInit{
       editoriales: editoriales,
       autores: autores
     }
-    if(this.options.value == "0"){
-      this.sql.alta(this.sql.URL+"/RegProd",body).then((res)=>{
+    if (this.options.value == "0") {
+      this.sql.alta(this.sql.URL + "/RegProd", body).then((res) => {
         let respuesta = <res>res;
-        if(respuesta.success){
-          Swal.fire('Registro','Se ha registrado correctamente el producto','success');
+        if (respuesta.success) {
+          Swal.fire('Registro', 'Se ha registrado correctamente el producto', 'success');
           this.limpiarFormulario();
           this.getData();
-        }else{
-          Swal.fire('Registro','Ha ocurrido un error al registrar el producto, faltan datos ','error');
+        } else {
+          Swal.fire('Registro', 'Ha ocurrido un error al registrar el producto, faltan datos ', 'error');
         }
       })
-    }else{
-      this.sql.alta(this.sql.URL+"/ActProd",body).then((res)=>{
+    } else {
+      this.sql.alta(this.sql.URL + "/ActProd", body).then((res) => {
         let respuesta = <res>res;
-        if(respuesta.success){
-          Swal.fire('Actualizar','Se ha actualizado correctamente el producto','success');
+        if (respuesta.success) {
+          Swal.fire('Actualizar', 'Se ha actualizado correctamente el producto', 'success');
           this.limpiarFormulario();
           this.getData();
-        }else{
-          Swal.fire('Actualizar','Ha ocurrido un error al actualizar el producto, faltan datos','error')
+        } else {
+          Swal.fire('Actualizar', 'Ha ocurrido un error al actualizar el producto, faltan datos', 'error')
         }
 
       });
     }
-    
+
+  }
+
+  setButtinDisabled() {
+
   }
 
 }
 
-interface datosProducto{
-  producto:producto;
-  autores:any[];
-  editoriales:any[];
+interface datosProducto {
+  producto: producto;
+  autores: any[];
+  editoriales: any[];
 }
-interface producto{
-  success:boolean;
-  ISBN:string;
-  nombre:string;
-  precio:number;
-  existencias:number;
-  impuesto:number;
+interface producto {
+  success: boolean;
+  ISBN: string;
+  nombre: string;
+  precio: number;
+  existencias: number;
+  impuesto: number;
 }
