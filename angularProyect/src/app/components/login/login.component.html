@@ -6,20 +6,21 @@
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <div class="input-group">
-              <span class="input-group-text" id="basic-addon1">Usuario:</span>
+              <label class="input-group-text" for="usuario" id="basic-addon1">Usuario:</label>
               <input
                 type="text"
                 class="form-control"
                 placeholder="Username"
                 aria-label="Username"
                 aria-describedby="basic-addon1"
+                id="usuario"
                 [(ngModel)]="usuario"
               />
             </div>
           </li>
           <li class="list-group-item">
             <div class="input-group">
-              <span class="input-group-text" id="basic-addon1">Contraseña:</span>
+              <label class="input-group-text" for="contrasena" id="basic-addon1">Contraseña:</label>
               <input
                 type="password"
                 class="form-control"
@@ -27,11 +28,12 @@
                 aria-label="Password"
                 aria-describedby="basic-addon1"
                 [(ngModel)]="contrasena"
+                id="contrasena"
               />
             </div>
           </li>
           <li class="list-group-item text-center">
-            <button class="btn btn-lg btn-primary" (click)="login()">Iniciar Sesión</button>
+            <input type="submit" class="btn btn-lg btn-primary" (click)="login()" value="Iniciar Sesión">
           </li>
         </ul>
       </div>

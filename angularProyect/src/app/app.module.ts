@@ -9,7 +9,7 @@ import { CrearNVComponent } from './components/crear-nv/crear-nv.component';
 import { InicioComponent } from './components/inicio/inicio.component';
 import { ConsultarNvComponent } from './components/consultar-nv/consultar-nv.component';
 import { LoginComponent } from './components/login/login.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SQLService } from './services/sql.service';
 
 @NgModule({
@@ -26,7 +26,8 @@ import { SQLService } from './services/sql.service';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [SQLService],
   bootstrap: [AppComponent]
