@@ -13,7 +13,7 @@ export class ConsultarNvComponent implements OnInit {
   NVs:infoNV[] = [];
   NVsfiltradas:infoNV[] = [];
   busqueda:string = "";
-  termino!:HTMLInputElement; 
+  termino!:HTMLInputElement;
   detalleNV!:any;
 
   constructor(private sql:SQLService){
@@ -24,7 +24,7 @@ export class ConsultarNvComponent implements OnInit {
   }
 
   async consNV(){
-    let consulta = await this.sql.consulta(this.sql.URL+"/ConsNV");
+    let consulta = await this.sql.consulta(this.sql.URL+"/consulta/ConsNV");
     let retornar:infoNV[] = [];
     consulta.forEach((nv: any)=>{
       this.NVs = <infoNV[]>nv;
@@ -37,9 +37,9 @@ export class ConsultarNvComponent implements OnInit {
     this.NVs.forEach((detalle: any) => {
       console.log(detalle.folioNV)
     });
-  
+
     //let consulta = await this.sql.alta(this.sql.URL+"/ConsDetalleNV",)
- 
+
   }
 
   initBusqueda(){
@@ -65,9 +65,9 @@ export class ConsultarNvComponent implements OnInit {
     let body = {
       idNV:folio
     }
-    
+
     let vacio:detNV[] = [];
-    this.detalleNV = await this.sql.alta(this.sql.URL+"/ConsDetalleNV",body).then((res)=>{
+    this.detalleNV = await this.sql.alta(this.sql.URL+"/consulta/ConsDetalleNV",body).then((res)=>{
       console.log(res);
       let details = <detNV[]>res || vacio;
       let detalles:string = "";
@@ -128,7 +128,7 @@ export class ConsultarNvComponent implements OnInit {
         width:'80%',
       });
     });
-    
+
   }
 }
 interface infoNV{
