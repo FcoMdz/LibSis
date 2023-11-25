@@ -16,7 +16,7 @@ router.post('/RegProd',
 (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        res.json({success:false, err:JSON.stringify(errors)});
+        res.json({success:false, err:errors});
         return;
     }
     let body = req.body;
@@ -24,7 +24,7 @@ router.post('/RegProd',
         if(sqlErr){
             res.send({
                     success:false, 
-                    err: JSON.stringify(sqlErr)
+                    err: sqlErr
                 });
             return;
         }
@@ -70,7 +70,7 @@ router.post('/CrearNV',
 (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        res.json({success:false, err:JSON.stringify(errors)});
+        res.json({success:false, err:errors});
         console.log(errors);
         return;
     }
@@ -103,9 +103,9 @@ router.post('/CrearNV',
             sql.query(`INSERT INTO notaventa (fechaVenta, clienteId_cte) VALUES (?, ?)`, [fecha, body.idCte], (sqlErr, sqlRes) => {
                 if(sqlErr){
                     console.log(sqlErr);
-                    res.send({ array:null, 
+                    res.send({
                             success:false, 
-                            err: JSON.stringify(sqlErr)
+                            err: sqlErr
                         });
                     return;
                 }
@@ -120,10 +120,13 @@ router.post('/CrearNV',
                     });
                 });
                 if(errores.length!=0){
-                    res.send({success: false, err: JSON.stringify(errores)});
+                    res.send({success: false, err: errores});
                     return;
                 }
-                res.send({success:true, err: sqlRes.insertId});
+                res.send({
+                    success:true, 
+                    err: sqlRes.insertId
+                });
             });
         }
     });
@@ -137,7 +140,7 @@ router.post('/CrearNC',
 (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        res.json({success:false, err:JSON.stringify(errors)});
+        res.json({success:false, err:errors});
         console.log(errors);
         return;
     }
@@ -171,7 +174,7 @@ router.post('/CrearNC',
                 if(sqlErr){
                     res.send({ array:null, 
                             success:false, 
-                            err: JSON.stringify(sqlErr)
+                            err: sqlErr
                         });
                     return;
                 }
@@ -186,7 +189,7 @@ router.post('/CrearNC',
                     });
                 });
                 if(errores.length!=0){
-                    res.send({success: false, err: JSON.stringify(errores)});
+                    res.send({success: false, err: errores});
                     return;
                 }
                 res.send({success:true, err: sqlRes.insertId});
@@ -204,7 +207,7 @@ router.post('/CrearEnc',
 (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        res.json({success:false, err:JSON.stringify(errors)});
+        res.json({success:false, err:errors});
         console.log(errors);
         return;
     }
@@ -236,7 +239,7 @@ router.post('/CrearEnc',
                     console.log(sqlErr);
                     res.send({ array:null, 
                             success:false, 
-                            err: JSON.stringify(sqlErr)
+                            err: sqlErr
                         });
                     return;
                 }
@@ -251,7 +254,7 @@ router.post('/CrearEnc',
                     });
                 });
                 if(errores.length!=0){
-                    res.send({success: false, err: JSON.stringify(errores)});
+                    res.send({success: false, err: errores});
                     return;
                 }
                 res.send({success:true, err: sqlRes.insertId});
@@ -269,7 +272,7 @@ router.post('/CrearNA',
 (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        res.json({success:false, err:JSON.stringify(errors)});
+        res.json({success:false, err:errors});
         console.log(errors);
         return;
     }
@@ -304,7 +307,7 @@ router.post('/CrearNA',
                     console.log(sqlErr);
                     res.send({ array:null, 
                             success:false, 
-                            err: JSON.stringify(sqlErr)
+                            err: sqlErr
                         });
                     return;
                 }
@@ -319,7 +322,7 @@ router.post('/CrearNA',
                     });
                 });
                 if(errores.length!=0){
-                    res.send({success: false, err: JSON.stringify(errores)});
+                    res.send({success: false, err: errores});
                     return;
                 }
                 res.send({success:true, err: sqlRes.insertId});
