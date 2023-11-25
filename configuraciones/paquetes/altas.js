@@ -124,7 +124,7 @@ router.post('/NV',
                             }
                             res.send({
                                 success:true, 
-                                err: sqlRes.insertId
+                                id: sqlRes1.insertId
                             });
                             sql.commit();
                         });

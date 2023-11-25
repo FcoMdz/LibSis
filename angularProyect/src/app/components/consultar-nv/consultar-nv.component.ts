@@ -32,16 +32,6 @@ export class ConsultarNvComponent implements OnInit {
     });
   }
 
-  async DetallesNotasVenta(){
-    console.log(this.NVs);
-    this.NVs.forEach((detalle: any) => {
-      console.log(detalle.folioNV)
-    });
-
-    //let consulta = await this.sql.alta(this.sql.URL+"/ConsDetalleNV",)
-
-  }
-
   initBusqueda(){
     this.NVsfiltradas = this.NVs;
     this.termino = <HTMLInputElement> document.getElementById("termino")!;
@@ -68,19 +58,18 @@ export class ConsultarNvComponent implements OnInit {
 
     let vacio:detNV[] = [];
     this.detalleNV = await this.sql.alta(this.sql.URL+"/consulta/ConsDetalleNV",body).then((res)=>{
-      console.log(res);
       let details = <detNV[]>res || vacio;
       let detalles:string = "";
       let subtotal:number = 0;
       let impuestosTotal:number = 0;
       let total:number = 0;
       details.forEach((detail:detNV)=>{
-        subtotal += (detail.precioProducto*detail.cantidadProdcuto);
-        impuestosTotal += (detail.impuesto*detail.cantidadProdcuto);
+        subtotal += (detail.precioProducto*detail.cantidadProducto);
+        impuestosTotal += (detail.impuesto*detail.cantidadProducto);
         detalles += `
               <tr>
                 <td>$${detail.precioProducto}</td>
-                <td> ${detail.cantidadProdcuto} </td>
+                <td> ${detail.cantidadProducto} </td>
                 <td>$${detail.impuesto}</td>
                 <td>  ${detail.productoISBN}</td>
               </tr>
@@ -139,8 +128,9 @@ interface infoNV{
 }
 interface detNV{
   precioProducto:number,
-  cantidadProdcuto:number,
+  cantidadProducto:number,
   impuesto:number,
   productoISBN:string,
-  notaVentaFolioNV:number
+  notaVentaFolioNV:number,
+  nombre: String
 }
