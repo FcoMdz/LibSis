@@ -597,25 +597,50 @@ CREATE TRIGGER elimina_compra BEFORE DELETE ON detallenc
 -- y su estado es entregado
 --
 DELIMITER //
+CREATE TRIGGER post_delete_detallena
+AFTER DELETE ON detallena
+FOR EACH ROW
+  BEGIN
+    DECLARE v_estatus VARCHAR(2);
+    SELECT  estatus
+    INTO v_estatus
+    FROM notaapartado
+    WHERE notaapartado.FolioNA = old.notaApartadoFolioNA;
+    if v_estatus = 'ae' then
+      SIGNAL SQLSTATE '42003'
+      SET MESSAGE_TEXT = 'Error: No se puede eliminar una nota de apartado entregada, elimine la nota de venta';
+    else
+      UPDATE producto SET existencias = existencias + old.cantidadProducto WHERE ISBN=old.productoISBN;
+    end if;
+  END;
+//
+
+DELIMITER //
 CREATE TRIGGER prev_inserta_detallena
-BEFORE INSERT ON detallena
+AFTER INSERT ON detallena
 FOR EACH ROW
   BEGIN
     DECLARE v_total FLOAT;
     DECLARE v_abono FLOAT;
+    DECLARE v_estatus VARCHAR(2);
     SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
     INTO v_total
     FROM detallena
     WHERE new.notaApartadoFolioNA = detallena.notaApartadoFolioNA
     GROUP BY detallena.notaApartadoFolioNA;
 
-    SELECT abono
-    INTO v_abono
+    SELECT abono, estatus
+    INTO v_abono, v_estatus
     FROM notaapartado
     WHERE notaapartado.FolioNA = new.notaApartadoFolioNA;
-    IF v_total < v_abono THEN
+    IF v_estatus = 'ae' THEN
+      SIGNAL SQLSTATE '42002'
+      SET MESSAGE_TEXT = 'Error: No se puede entregar el producto al crear la nota de apartado';
+    ELSEIF v_total < v_abono THEN
       SIGNAL SQLSTATE '42001'
       SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    ELSE
+      UPDATE producto SET existencias = existencias - new.cantidadProducto WHERE producto.ISBN = new.productoISBN;
     END IF;
   END;
 //
@@ -648,6 +673,14 @@ FOR EACH ROW
   BEGIN
     DECLARE Idnv VARCHAR(18);
     DECLARE v_total FLOAT;
+    DECLARE v_cant_prod INT(11);
+    DECLARE v_prod_ISBN VARCHAR(18);
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cursor_detalles CURSOR FOR
+    SELECT cantidadProducto, productoISBN
+    FROM detallena
+    WHERE new.FolioNA = detallena.notaApartadoFolioNA;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     -- Obtener el total del costo, para compararlo con el abono
     SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
@@ -662,6 +695,19 @@ FOR EACH ROW
       INSERT INTO notaventa(fechaVenta, clienteId_cte)
       VALUES (CURRENT_DATE(), NEW.clienteId_cte);
       SELECT LAST_INSERT_ID() INTO Idnv;
+      -- Se regresan la cantidad a existencias para que al insertarlo en los detalles
+      -- de venta, se vuelvan a quitar
+      OPEN cursor_detalles;
+      recorrer: LOOP
+        FETCH cursor_detalles INTO v_cant_prod, v_prod_ISBN;
+        IF done THEN
+          LEAVE recorrer;
+        END IF;
+        UPDATE producto 
+        SET existencias = existencias + v_cant_prod 
+        WHERE ISBN = v_prod_ISBN COLLATE utf8mb4_general_ci;
+      END LOOP recorrer;
+      CLOSE cursor_detalles;
       -- Se traspasan todos los detalles de la nota de apartado a una nota de venta
       INSERT INTO detallenv(precioProducto, cantidadProducto, impuesto, productoISBN, notaVentaFolioNV)
       SELECT precioProducto, cantidadProducto, impuestoProducto, productoISBN, Idnv
@@ -676,23 +722,44 @@ FOR EACH ROW
 -- y su estado es entregado
 --
 DELIMITER //
+CREATE TRIGGER post_delete_detalleencargo
+AFTER DELETE ON detalleencargo
+FOR EACH ROW
+  BEGIN
+    DECLARE v_estatus VARCHAR(2);
+    SELECT  estatus
+    INTO v_estatus
+    FROM encargo
+    WHERE encargo.FolioEncargo = old.encargoFolioEncargo;
+    if v_estatus = 'ee' then
+      SIGNAL SQLSTATE '42003'
+      SET MESSAGE_TEXT = 'Error: No se puede eliminar un encargo entregado, elimine la nota de venta';
+    end if;
+  END;
+//
+
+DELIMITER //
 CREATE TRIGGER prev_inserta_detalleencargo
-BEFORE INSERT ON detalleencargo
+AFTER INSERT ON detalleencargo
 FOR EACH ROW
   BEGIN
     DECLARE v_total FLOAT;
     DECLARE v_abono FLOAT;
+    DECLARE v_estatus VARCHAR(2);
     SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
     INTO v_total
     FROM detalleencargo
     WHERE new.encargoFolioEncargo = detalleencargo.encargoFolioEncargo
     GROUP BY detalleencargo.encargoFolioEncargo;
 
-    SELECT abono
-    INTO v_abono
+    SELECT abono, estatus
+    INTO v_abono, v_estatus
     FROM encargo
     WHERE encargo.FolioEncargo = new.encargoFolioEncargo;
-    IF v_total < v_abono THEN
+    IF v_estatus = 'ee' THEN
+      SIGNAL SQLSTATE '42000'
+      SET MESSAGE_TEXT = 'Error: No se puede entregar el producto al crear el encargo';
+    ELSEIF v_total < v_abono THEN
       SIGNAL SQLSTATE '42001'
       SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
     END IF;

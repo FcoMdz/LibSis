@@ -113,29 +113,35 @@ router.post('/NA',
         return
     }
     let body = req.body
-    sql.query(`DELETE FROM detallena WHERE notaApartadoFolioNA = ?`, 
-        [body.folioNA], (sqlErr, sqrRes) => {
-        if(sqlErr){
-            res.send({
-                success: false,
-                err: sqlErr
-            })
-            return
-        }
-        sql.query(`DELETE FROM notaapartado WHERE FolioNA = ?`, 
-            [body.folioNA],(sqlErr1, sqlRes1) => {
-            if(sqlErr1){
+    sql.beginTransaction((err) => {
+        sql.query(`DELETE FROM detallena WHERE notaApartadoFolioNA = ?`, 
+            [body.folioNA], (sqlErr, sqrRes) => {
+            if(sqlErr){
+                sql.rollback()
                 res.send({
                     success: false,
-                    err: sqlErr1
+                    err: sqlErr
                 })
                 return
             }
-            res.send({
-                success: true
+            sql.query(`DELETE FROM notaapartado WHERE FolioNA = ?`, 
+                [body.folioNA],(sqlErr1, sqlRes1) => {
+                if(sqlErr1){
+                    sql.rollback()
+                    res.send({
+                        success: false,
+                        err: sqlErr1
+                    })
+                    return
+                }
+                res.send({
+                    success: true
+                })
+                sql.commit()
             })
         })
     })
+    
 })
 
 router.post('/Enc',
@@ -149,9 +155,11 @@ router.post('/Enc',
         return
     }
     let body = req.body
-    sql.query(`DELETE FROM detalleencargo WHERE encargoFolioEncargo = ?`, 
+    sql.beginTransaction((err) => {
+        sql.query(`DELETE FROM detalleencargo WHERE encargoFolioEncargo = ?`, 
         [body.folioEnc], (sqlErr, sqrRes) => {
         if(sqlErr){
+            sql.rollback()
             res.send({
                 success: false,
                 err: sqlErr
@@ -161,6 +169,7 @@ router.post('/Enc',
         sql.query(`DELETE FROM encargo WHERE FolioEncargo = ?`, 
             [body.folioEnc],(sqlErr1, sqlRes1) => {
             if(sqlErr1){
+                sql.rollback()
                 res.send({
                     success: false,
                     err: sqlErr1
@@ -170,8 +179,11 @@ router.post('/Enc',
             res.send({
                 success: true
             })
+            sql.commit()
         })
     })
+    })
+    
 })
 
 module.exports = router
