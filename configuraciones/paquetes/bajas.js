@@ -15,7 +15,8 @@ router.post('/Prod',
     }
     let body = req.body
     let productoEliminar = body.ISBN
-    sql.query(`DELETE FROM producto WHERE ISBN=?`, [productoEliminar], (sqlErr, sqrRes) => {
+    sql.query(`UPDATE producto SET existencias=0 WHERE ISBN=?`, 
+        [productoEliminar], (sqlErr, sqrRes) => {
         if(sqlErr){
             res.send({
                 success: false,
@@ -25,6 +26,150 @@ router.post('/Prod',
         }
         res.send({
             success: true
+        })
+    })
+})
+
+router.post('/NV',
+[
+    body('folioNV').not().isEmpty().isString()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success: false, err: errors})
+        return
+    }
+    let body = req.body
+    sql.query(`DELETE FROM detallenv WHERE notaVentaFolioNV = ?`, 
+        [body.folioNV], (sqlErr, sqrRes) => {
+        if(sqlErr){
+            res.send({
+                success: false,
+                err: sqlErr
+            })
+            return;
+        }
+        sql.query(`DELETE FROM notaventa WHERE folioNV = ?`, 
+            [body.folioNV],(sqlErr1, sqlRes1) => {
+            if(sqlErr1){
+                res.send({
+                    success: false,
+                    err: sqlErr1
+                })
+                return;
+            }
+            res.send({
+                success: true
+            })
+        })
+    })
+})
+
+router.post('/NC',
+[
+    body('folioNC').not().isEmpty().isString()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success: false, err: errors})
+        return
+    }
+    let body = req.body
+    sql.query(`DELETE FROM detallenc WHERE notaCompraFolioNC = ?`, 
+        [body.folioNC], (sqlErr, sqrRes) => {
+        if(sqlErr){
+            res.send({
+                success: false,
+                err: sqlErr
+            })
+            return;
+        }
+        sql.query(`DELETE FROM notacompra WHERE FolioNC = ?`, 
+            [body.folioNC],(sqlErr1, sqlRes1) => {
+            if(sqlErr1){
+                res.send({
+                    success: false,
+                    err: sqlErr1
+                })
+                return;
+            }
+            res.send({
+                success: true
+            })
+        })
+    })
+})
+
+router.post('/NA',
+[
+    body('folioNA').not().isEmpty().isString()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success: false, err: errors})
+        return
+    }
+    let body = req.body
+    sql.query(`DELETE FROM detallena WHERE notaApartadoFolioNA = ?`, 
+        [body.folioNA], (sqlErr, sqrRes) => {
+        if(sqlErr){
+            res.send({
+                success: false,
+                err: sqlErr
+            })
+            return;
+        }
+        sql.query(`DELETE FROM notaapartado WHERE FolioNA = ?`, 
+            [body.folioNA],(sqlErr1, sqlRes1) => {
+            if(sqlErr1){
+                res.send({
+                    success: false,
+                    err: sqlErr1
+                })
+                return;
+            }
+            res.send({
+                success: true
+            })
+        })
+    })
+})
+
+router.post('/Enc',
+[
+    body('folioEnc').not().isEmpty().isString()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success: false, err: errors})
+        return
+    }
+    let body = req.body
+    sql.query(`DELETE FROM detalleencargo WHERE encargoFolioEncargo = ?`, 
+        [body.folioEnc], (sqlErr, sqrRes) => {
+        if(sqlErr){
+            res.send({
+                success: false,
+                err: sqlErr
+            })
+            return;
+        }
+        sql.query(`DELETE FROM encargo WHERE FolioEncargo = ?`, 
+            [body.folioEnc],(sqlErr1, sqlRes1) => {
+            if(sqlErr1){
+                res.send({
+                    success: false,
+                    err: sqlErr1
+                })
+                return;
+            }
+            res.send({
+                success: true
+            })
         })
     })
 })

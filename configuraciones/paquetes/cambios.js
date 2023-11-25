@@ -3,7 +3,7 @@ const {body, validationResult} = require('express-validator')
 const router = express.Router()
 const sql = require('../conection')
 
-router.post('/ActProd', 
+router.post('/Prod', 
 [
     body('ISBN').not().isEmpty().isString(),
     body('nombre').not().isEmpty().isString(),
@@ -69,7 +69,7 @@ router.post('/ActProd',
 }
 );
 
-router.post('/ActNV', 
+router.post('/NV', 
 [
     body('idNV').not().isEmpty().isInt(),
     body('ISBNProds').not().isEmpty()
@@ -140,7 +140,7 @@ router.post('/ActNV',
     });
 });
 
-router.post('/ActNC', 
+router.post('/NC', 
 [
     body('idNC').not().isEmpty().isInt(),
     body('ISBNProds').not().isEmpty()
@@ -211,10 +211,11 @@ router.post('/ActNC',
     });
 });
 
-router.post('/ActNA', 
+router.post('/NA', 
 [
     body('idNA').not().isEmpty().isInt(),
-    body('abono').not().isEmpty()
+    body('abono').not().isEmpty(),
+    body('estatus').not().isEmpty()
 ],
 (req, res) => {
     const errors = validationResult(req);
@@ -224,7 +225,7 @@ router.post('/ActNA',
         return;
     }
     let body = req.body;
-    sql.query(`UPDATE notaapartado SET abono = abono + ? WHERE FolioNA = ?`, [body.abono, body.idNA], (sqlErr, sqlRes) => {
+    sql.query(`UPDATE notaapartado SET abono = abono + ?, estatus = ? WHERE FolioNA = ?`, [body.abono, body.estatus, body.idNA], (sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({success:false, err: sqlErr.message});
             console.log(sqlErr);
@@ -234,10 +235,11 @@ router.post('/ActNA',
     });
 });
 
-router.post('/ActEnc', 
+router.post('/Enc', 
 [
     body('idEnc').not().isEmpty().isInt(),
-    body('abono').not().isEmpty()
+    body('abono').not().isEmpty(),
+    body('estatus').not().isEmpty()
 ],
 (req, res) => {
     const errors = validationResult(req);
@@ -247,7 +249,7 @@ router.post('/ActEnc',
         return;
     }
     let body = req.body;
-    sql.query(`UPDATE encargo SET abono = abono + ? WHERE FolioEncargo = ?`, [body.abono, body.idEnc], (sqlErr, sqlRes) => {
+    sql.query(`UPDATE encargo SET abono = abono + ?, estatus = ? WHERE FolioEncargo = ?`, [body.abono, body.estatus, body.idEnc], (sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({success:false, err: sqlErr.message});
             console.log(sqlErr);
