@@ -597,6 +597,51 @@ CREATE TRIGGER elimina_compra BEFORE DELETE ON detallenc
 -- y su estado es entregado
 --
 DELIMITER //
+CREATE TRIGGER prev_inserta_detallena
+BEFORE INSERT ON detallena
+FOR EACH ROW
+  BEGIN
+    DECLARE v_total FLOAT;
+    DECLARE v_abono FLOAT;
+    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
+    INTO v_total
+    FROM detallena
+    WHERE new.notaApartadoFolioNA = detallena.notaApartadoFolioNA
+    GROUP BY detallena.notaApartadoFolioNA;
+
+    SELECT abono
+    INTO v_abono
+    FROM notaapartado
+    WHERE notaapartado.FolioNA = new.notaApartadoFolioNA;
+    IF v_total < v_abono THEN
+      SIGNAL SQLSTATE '42001'
+      SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    END IF;
+  END;
+//
+
+DELIMITER //
+CREATE TRIGGER prev_actualiza_apartado
+BEFORE UPDATE ON notaapartado
+FOR EACH ROW
+  BEGIN
+    DECLARE v_total FLOAT;
+    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
+    INTO v_total
+    FROM detallena
+    WHERE new.FolioNA = detallena.notaApartadoFolioNA
+    GROUP BY detallena.notaApartadoFolioNA;
+    IF v_total > new.abono AND new.estatus = 'ae' THEN
+      SIGNAL SQLSTATE '42000'
+      SET MESSAGE_TEXT = 'Error: No se puede entregar el producto sin que este completamente pagado';
+    ELSEIF v_total < new.abono THEN
+      SIGNAL SQLSTATE '42001'
+      SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    END IF;
+  END;
+//
+
+DELIMITER //
 CREATE TRIGGER actualiza_apartado 
 AFTER UPDATE ON notaapartado
 FOR EACH ROW
@@ -612,7 +657,7 @@ FOR EACH ROW
     GROUP BY detallena.notaApartadoFolioNA;
 
     -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
-    IF v_total <= new.abono AND new.estatus = 'ae' THEN
+    IF v_total = new.abono AND new.estatus = 'ae' THEN
       -- Obtener folioNV
       INSERT INTO notaventa(fechaVenta, clienteId_cte)
       VALUES (CURRENT_DATE(), NEW.clienteId_cte);
@@ -631,6 +676,51 @@ FOR EACH ROW
 -- y su estado es entregado
 --
 DELIMITER //
+CREATE TRIGGER prev_inserta_detalleencargo
+BEFORE INSERT ON detalleencargo
+FOR EACH ROW
+  BEGIN
+    DECLARE v_total FLOAT;
+    DECLARE v_abono FLOAT;
+    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
+    INTO v_total
+    FROM detalleencargo
+    WHERE new.encargoFolioEncargo = detalleencargo.encargoFolioEncargo
+    GROUP BY detalleencargo.encargoFolioEncargo;
+
+    SELECT abono
+    INTO v_abono
+    FROM encargo
+    WHERE encargo.FolioEncargo = new.encargoFolioEncargo;
+    IF v_total < v_abono THEN
+      SIGNAL SQLSTATE '42001'
+      SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    END IF;
+  END;
+//
+
+DELIMITER //
+CREATE TRIGGER prev_actualiza_encargo
+BEFORE UPDATE ON encargo
+FOR EACH ROW
+  BEGIN
+    DECLARE v_total FLOAT;
+    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
+    INTO v_total
+    FROM detalleencargo
+    WHERE new.FolioEncargo = detalleencargo.encargoFolioEncargo
+    GROUP BY detalleencargo.encargoFolioEncargo;
+    IF v_total > new.abono AND new.estatus = 'ee' THEN
+      SIGNAL SQLSTATE '42000'
+      SET MESSAGE_TEXT = 'Error: No se puede entregar el producto sin que este completamente pagado';
+    ELSEIF v_total < new.abono THEN
+      SIGNAL SQLSTATE '42001'
+      SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    END IF;
+  END;
+//
+
+DELIMITER //
 CREATE TRIGGER actualiza_encargo
 AFTER UPDATE ON encargo
 FOR EACH ROW
@@ -646,7 +736,7 @@ FOR EACH ROW
     GROUP BY detalleencargo.encargoFolioEncargo;
 
     -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
-    IF v_total <= new.abono AND new.estatus = 'ee' THEN
+    IF v_total = new.abono AND new.estatus = 'ee' THEN
       -- Obtener folioNV
       INSERT INTO notaventa(fechaVenta, clienteId_cte)
       VALUES (CURRENT_DATE(), NEW.clienteId_cte);

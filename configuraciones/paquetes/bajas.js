@@ -22,7 +22,7 @@ router.post('/Prod',
                 success: false,
                 err: sqlErr
             })
-            return;
+            return
         }
         res.send({
             success: true
@@ -48,7 +48,7 @@ router.post('/NV',
                 success: false,
                 err: sqlErr
             })
-            return;
+            return
         }
         sql.query(`DELETE FROM notaventa WHERE folioNV = ?`, 
             [body.folioNV],(sqlErr1, sqlRes1) => {
@@ -57,7 +57,7 @@ router.post('/NV',
                     success: false,
                     err: sqlErr1
                 })
-                return;
+                return
             }
             res.send({
                 success: true
@@ -84,7 +84,7 @@ router.post('/NC',
                 success: false,
                 err: sqlErr
             })
-            return;
+            return
         }
         sql.query(`DELETE FROM notacompra WHERE FolioNC = ?`, 
             [body.folioNC],(sqlErr1, sqlRes1) => {
@@ -93,7 +93,7 @@ router.post('/NC',
                     success: false,
                     err: sqlErr1
                 })
-                return;
+                return
             }
             res.send({
                 success: true
@@ -120,7 +120,7 @@ router.post('/NA',
                 success: false,
                 err: sqlErr
             })
-            return;
+            return
         }
         sql.query(`DELETE FROM notaapartado WHERE FolioNA = ?`, 
             [body.folioNA],(sqlErr1, sqlRes1) => {
@@ -129,7 +129,7 @@ router.post('/NA',
                     success: false,
                     err: sqlErr1
                 })
-                return;
+                return
             }
             res.send({
                 success: true
@@ -156,7 +156,7 @@ router.post('/Enc',
                 success: false,
                 err: sqlErr
             })
-            return;
+            return
         }
         sql.query(`DELETE FROM encargo WHERE FolioEncargo = ?`, 
             [body.folioEnc],(sqlErr1, sqlRes1) => {
@@ -165,7 +165,7 @@ router.post('/Enc',
                     success: false,
                     err: sqlErr1
                 })
-                return;
+                return
             }
             res.send({
                 success: true
