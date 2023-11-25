@@ -20,6 +20,7 @@
               <th>Folio</th>
               <th>Fecha</th>
               <th>Id Cliente</th>
+              <th>Nombre cliente</th>
             </tr>
           </thead>
           <tbody>
@@ -27,6 +28,7 @@
               <td><button class="btn btn-outline-light" style="width: 100%;" (click)="mostrarDetalles(nv.folioNV)">{{nv.folioNV}}</button></td>
               <td>{{nv.fechaVenta | date}}</td>
               <td>{{nv.clienteId_cte}}</td>
+              <td>{{nv.nombre}}</td>
           </tr>
           </tbody>
         </table>

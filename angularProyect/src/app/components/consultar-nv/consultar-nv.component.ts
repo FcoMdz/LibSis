@@ -27,6 +27,7 @@ export class ConsultarNvComponent implements OnInit {
     let consulta = await this.sql.consulta(this.sql.URL+"/consulta/ConsNV");
     let retornar:infoNV[] = [];
     consulta.forEach((nv: any)=>{
+      console.log(nv)
       this.NVs = <infoNV[]>nv;
       this.initBusqueda();
     });
@@ -124,7 +125,7 @@ interface infoNV{
   clienteId_cte:number;
   fechaVenta:string;
   folioNV:number;
-
+  nombre: String;
 }
 interface detNV{
   precioProducto:number,

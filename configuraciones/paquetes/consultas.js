@@ -111,7 +111,7 @@ router.get('/consCte', (req, res) => {
 });
 
 router.get('/ConsNV', (req, res) => {
-    sql.query(`SELECT * FROM notaventa`, (sqlErr, sqlRes) => {
+    sql.query(`SELECT nv.*, cte.nombre FROM notaventa nv, cliente cte WHERE cte.id_cte=nv.clienteId_cte`, (sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({success:false, err: sqlErr.message});
             return;
