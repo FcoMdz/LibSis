@@ -42,7 +42,7 @@ export class RegistrarComponent implements OnInit {
     ]),
     existencias: new FormControl('', [
       Validators.required,
-      Validators.pattern('^[0-9]$'),
+      Validators.pattern('^[0-9]*$'),
     ]),
     impuesto: new FormControl('', [
       Validators.required,
