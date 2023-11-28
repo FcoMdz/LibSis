@@ -1,0 +1,90 @@
+<div class="container" *ngIf=" usuario && (usuario.vendedor || usuario.admin); else iniciarSesion">
+    <div class="row text-center">
+      <div class="col-12">
+        <h2>REGISTRO DE PROVEEDORES</h2>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8 col-xxl-6">
+        <form [formGroup]="formUser">
+          <div class="card">
+            <div class="card-header">Ingrese los siguientes datos</div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="options">Proveedor</label>
+                  <select class="form-select" id="options">
+                    <option value="0" selected>Nuevo Proveedor</option>
+                    <option *ngFor="let Proveedor of proveedores" value="{{ Proveedor.idProv }}">{{proveedores.idprov}}</option>
+                  </select>
+                </div>
+              </li>
+
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
+                  <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre del proveedor"
+                    aria-label="Nombre producto" aria-describedby="basic-addon1" id="nombre" required />
+                </div>
+  
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('nombre')?.valid || formUser.get('nombre')?.pristine">
+                  <span *ngIf="formUser.get('nombre')?.errors?.['required']">
+                    El nombre es requerido.
+                  </span>
+                </div>
+  
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="telefono" id="basic-addon1">telefono</label>
+                  <input type="text" class="form-control" formControlName="telefono" placeholder="XXX - XXX - XXXX"
+                    aria-label="Nombre producto" aria-describedby="basic-addon1" id="telefono" required />
+                </div>
+  
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('telefono')?.valid || formUser.get('telefono')?.pristine">
+                  <span *ngIf="formUser.get('telefono')?.errors?.['required']">
+                    El telefono es requerido.
+                  </span>
+                  <span *ngIf="formUser.get('telefono')?.errors?.['pattern']">
+                    El telefono solo admite numeros
+                  </span>
+                </div>
+  
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label for="rfc" class="input-group-text" id="basic-addon1">RFC</label>
+                  <input type="text" class="form-control" formControlName="rfc" placeholder="XXXXXXXXXXXXX"
+                    aria-label="Username" aria-describedby="basic-addon1" id="rfc" required />
+                </div>
+  
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('rfc')?.valid || formUser.get('rfc')?.pristine">
+                  <span *ngIf="formUser.get('rfc')?.errors?.['required']">
+                    El RFC es requerido.
+                  </span>
+                  <span *ngIf="formUser.get('rfc')?.errors?.['maxlength']">
+                    El RFC no puede ser mayor a 13 caracteres.
+                  </span>
+                </div>
+  
+              </li>
+            </ul>
+          </div>
+          <div class="text-center my-2">
+            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProv()" id="btnReg"
+              [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar 
+              <i class="fa-solid fa-book"></i></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <ng-template #iniciarSesion>
+    <div class="container my-4 text-center">
+      <h1>Inicie sesión para acceder a esta página</h1>
+    </div>
+  </ng-template>

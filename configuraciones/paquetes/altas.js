@@ -345,5 +345,34 @@ router.post('/NA',
     
 })
 
+router.post("/RegProv",
+[
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString(),
+    body('rfc').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO proveedor (nombre,telefono,RFC) VALUES (?,?,?)`, [body.nombre,body.telefono,body.rfc],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
 module.exports = router
 

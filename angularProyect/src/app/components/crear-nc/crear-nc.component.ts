@@ -2,19 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { SQLService, res } from 'src/app/services/sql.service';
 import Swal from 'sweetalert2';
 import { FormGroup, FormControl, Validators } from "@angular/forms";
-
 @Component({
-  selector: 'app-crear-nv',
-  templateUrl: './crear-nv.component.html',
-  styleUrls: ['./crear-nv.component.css']
+  selector: 'app-crear-nc',
+  templateUrl: './crear-nc.component.html',
+  styleUrls: ['./crear-nc.component.css']
 })
-export class CrearNVComponent implements OnInit {
+export class CrearNcComponent implements OnInit {
   usuario: any = sessionStorage.getItem('usuario');
   productos: any;
   options!: HTMLSelectElement;
   cliente!: HTMLSelectElement;
   cantidad!: number;
-  clientes!: any;
+  Proveedores!: any;
   precio!: HTMLSelectElement;
   cantidadMax!: number;
   Cte!: number;
@@ -29,7 +28,6 @@ export class CrearNVComponent implements OnInit {
   formUser = new FormGroup({
     'cantidad': new FormControl('', Validators.pattern('^[0-9]*$'))
   });
-
 
   constructor(private sql: SQLService) {
     if (this.usuario) this.usuario = JSON.parse(this.usuario);
@@ -47,14 +45,14 @@ export class CrearNVComponent implements OnInit {
 
   async consClientes() {
     let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consCte");
-    consulta.forEach((cte:any) => {
-      this.clientes = cte;
+    consulta.forEach((cte) => {
+      this.Proveedores = cte;
     });
   }
 
   async consProductos() {
     let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProds")
-    consulta.forEach((producto:any) => {
+    consulta.forEach((producto) => {
       this.productos = producto;
     });
   }
@@ -100,7 +98,7 @@ export class CrearNVComponent implements OnInit {
   }
 
   cargarNV() {
-    this.clientes.forEach((element: any) => {
+    this.Proveedores.forEach((element: any) => {
       if (element.id_cte == this.cliente.options[this.cliente.selectedIndex].value) {
         this.Cte = element.id_cte;
       }
@@ -126,6 +124,7 @@ export class CrearNVComponent implements OnInit {
     }
     this.sql.alta(this.sql.URL + "/alta/NV", body)
       .then((res) => {
+        console.log(res)
         let resultado = <res>res;
         if (!resultado.success) {
           Swal.fire('Regisrar', 'Error al reigstrar la nota de venta: ' + resultado.err, 'error');
@@ -238,3 +237,5 @@ class venderProducto {
     }
   }
 }
+
+

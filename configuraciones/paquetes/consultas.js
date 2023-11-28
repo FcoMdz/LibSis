@@ -119,6 +119,14 @@ router.get('/ConsNV', (req, res) => {
         res.send(sqlRes)
     })
 })
-
+router.get('/consProv',(req,res) => {
+    sql.query(`SELECT * FROM proveedor`,(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
 
 module.exports = router

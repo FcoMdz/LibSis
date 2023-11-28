@@ -11,6 +11,8 @@ import { ConsultarNvComponent } from './components/consultar-nv/consultar-nv.com
 import { LoginComponent } from './components/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SQLService } from './services/sql.service';
+import { CrearNcComponent } from './components/crear-nc/crear-nc.component';
+import { CrearProvComponent } from './components/crear-prov/crear-prov.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +22,8 @@ import { SQLService } from './services/sql.service';
     InicioComponent,
     ConsultarNvComponent,
     LoginComponent,
+    CrearNcComponent,
+    CrearProvComponent,
 
   ],
   imports: [
