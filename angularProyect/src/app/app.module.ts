@@ -11,6 +11,13 @@ import { ConsultarNvComponent } from './components/consultar-nv/consultar-nv.com
 import { LoginComponent } from './components/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SQLService } from './services/sql.service';
+import { RegClientesComponent } from './components/reg-clientes/reg-clientes.component';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { DropdownModule } from 'primeng/dropdown';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ConsEncargoComponent } from './components/cons-encargo/cons-encargo.component';
+import { ConsNotaApartadoComponent } from './components/cons-nota-apartado/cons-nota-apartado.component';
+import { RegNeComponent } from './components/reg-ne/reg-ne.component';
 
 @NgModule({
   declarations: [
@@ -20,16 +27,22 @@ import { SQLService } from './services/sql.service';
     InicioComponent,
     ConsultarNvComponent,
     LoginComponent,
-
+    RegClientesComponent,
+    ConsEncargoComponent,
+    ConsNotaApartadoComponent,
+    RegNeComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MultiSelectModule,
+    DropdownModule,
+    BrowserAnimationsModule,
   ],
   providers: [SQLService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

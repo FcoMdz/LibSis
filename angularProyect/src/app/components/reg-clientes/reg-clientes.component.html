@@ -12,21 +12,13 @@
           <li class="list-group-item">
             <div class="input-group">
               <label class="input-group-text" for="nombre">Nombre</label>
-              <input
-                type="text"
-                class="form-control"
-                id="nombre"
-                formControlName="nombre"
-              />
+              <input type="text" class="form-control" id="nombre" formControlName="nombre" />
             </div>
 
-            <div
-              class="alert alert-danger mt-2"
-              [hidden]="
+            <div class="alert alert-danger mt-2" [hidden]="
                 formGroup.get('nombre')?.valid ||
                 formGroup.get('nombre')?.pristine
-              "
-            >
+              ">
               <span *ngIf="formGroup.get('nombre')?.errors?.['required']">
                 El nombre es requerido.
               </span>
@@ -34,26 +26,15 @@
           </li>
           <li class="list-group-item">
             <div class="input-group">
-              <label for="telefono" class="input-group-text" id="basic-addon1"
-                >Telefono</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                formControlName="telefono"
-                placeholder="xxx-xxx-xx-xx"
-                id="telefono"
-                required
-              />
+              <label for="telefono" class="input-group-text" id="basic-addon1">Telefono</label>
+              <input type="text" class="form-control" formControlName="telefono" placeholder="xxx-xxx-xx-xx"
+                id="telefono" required />
             </div>
 
-            <div
-              class="alert alert-danger mt-2"
-              [hidden]="
+            <div class="alert alert-danger mt-2" [hidden]="
                 formGroup.get('telefono')?.valid ||
                 formGroup.get('telefono')?.pristine
-              "
-            >
+              ">
               <span *ngIf="formGroup.get('telefono')?.errors?.['required']">
                 El telefono es requerido.
               </span>
@@ -61,18 +42,17 @@
               <span *ngIf="formGroup.get('telefono')?.errors?.['pattern']">
                 El telefono solo puede tener numeros.
               </span>
+
+              <span *ngIf="formGroup.get('telefono')?.errors?.['maxLength']">
+                El telefono no es valido.
+              </span>
             </div>
           </li>
           <li class="list-group-item"></li>
         </ul>
       </div>
       <div class="text-center my-2">
-        <button
-          type="submit"
-          class="btn btn-lg btn-primary"
-          id="btnReg"
-          [disabled]="formGroup.invalid"
-        >
+        <button type="submit" class="btn btn-lg btn-primary" id="btnReg" [disabled]="formGroup.invalid">
           <i class="fa-solid fa-book"></i> Registrar
           <i class="fa-solid fa-book"></i>
         </button>

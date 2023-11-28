@@ -263,7 +263,7 @@ export class RegistrarComponent implements OnInit {
     }
   }
 
-  setButtinDisabled() {}
+  setButtinDisabled() { }
 }
 
 interface datosProducto {

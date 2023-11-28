@@ -14,6 +14,7 @@ export class RegClientesComponent {
     telefono: new FormControl('', [
       Validators.required,
       Validators.pattern('^[0-9]*$'),
+      Validators.maxLength(15),
     ]),
   });
 }
