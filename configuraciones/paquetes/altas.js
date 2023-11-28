@@ -24,7 +24,7 @@ router.post('/Prod',
         if(sqlErr){
             res.send({
                     success:false, 
-                    err: sqlErr
+                    err: sqlErr.message
                 })
             return
         }
@@ -107,7 +107,7 @@ router.post('/NV',
                         sql.rollback()
                         res.send({
                                 success:false, 
-                                err: sqlErr1
+                                err: sqlErr1.message
                             })
                         return
                     }
@@ -118,7 +118,7 @@ router.post('/NV',
                                 sql.rollback()
                                 res.send({
                                     success: false, 
-                                    err: sqlErr2
+                                    err: sqlErr2.message
                                 })
                                 return
                             }
@@ -177,7 +177,7 @@ router.post('/NC',
                 if(sqlErr1){
                     res.send({ array:null, 
                             success:false, 
-                            err: sqlErr1
+                            err: sqlErr1.message
                         })
                     return
                 }
@@ -187,7 +187,7 @@ router.post('/NC',
                         if(sqlErr2){
                             res.send({
                                 success: false,
-                                err: sqlErr2
+                                err: sqlErr2.message
                             })
                             return
                         }
@@ -246,7 +246,7 @@ router.post('/Enc',
                         sql.rollback()
                         res.send({ array:null, 
                                 success:false, 
-                                err: sqlErr1
+                                err: sqlErr1.message
                             })
                         return
                     }
@@ -257,7 +257,7 @@ router.post('/Enc',
                                 sql.rollback()
                                 res.send({
                                     success: false,
-                                    err: sqlErr2
+                                    err: sqlErr2.message
                                 })
                                 return
                             }
@@ -319,7 +319,7 @@ router.post('/NA',
                         sql.rollback()
                         res.send({
                                 success:false, 
-                                err: sqlErr1
+                                err: sqlErr1.message
                             })
                         return
                     }
@@ -330,7 +330,7 @@ router.post('/NA',
                                 sql.rollback()
                                 res.send({
                                     success: false,
-                                    err: sqlErr2
+                                    err: sqlErr2.message
                                 })
                                 return
                             }
@@ -345,7 +345,7 @@ router.post('/NA',
     
 })
 
-router.post("/RegProv",
+router.post("/Prov",
 [
     body('nombre').not().isEmpty().isString(),
     body('telefono').not().isEmpty().isString(),
@@ -359,6 +359,34 @@ router.post("/RegProv",
     }
     let body = req.body
     sql.query(`INSERT INTO proveedor (nombre,telefono,RFC) VALUES (?,?,?)`, [body.nombre,body.telefono,body.rfc],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
+router.post("/Edit",
+[
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO editorial (nombre,telefono) VALUES (?,?)`, [body.nombre,body.telefono],(sqlErr,sqlRes) => {
         if(sqlErr){
             res.send({
                     success:false, 

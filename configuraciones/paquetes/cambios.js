@@ -281,8 +281,65 @@ router.post('/Enc',
             }
             res.send({success:true})
         })
-    })
-    
+    }) 
 })
+
+router.post("/Prov",
+[
+    body('idProv').not().isEmpty().isInt(),
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString(),
+    body('rfc').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE proveedor SET nombre=?,telefono=?,RFC=? WHERE id_proveedor=?`, [body.nombre,body.telefono,body.rfc, body.idProv],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
+
+
+router.post("/Edit",
+[
+    body('idEdit').not().isEmpty().isInt(),
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE editorial SET nombre=?,telefono=? WHERE id_proveedor=?`, [body.nombre,body.telefono, body.idProv],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
 
 module.exports = router

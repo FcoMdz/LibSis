@@ -3,15 +3,6 @@ const {body, validationResult} = require('express-validator')
 const router = express.Router()
 const sql = require('../conection')
 
-router.get('/consEditoriales',(req, res) => {
-    sql.query(`SELECT * FROM editorial`, (sqlErr, sqlRes) => {
-        if(sqlErr){
-            res.send({success:false, err: sqlErr.message})
-            return
-        }
-        res.send(sqlRes)
-    })
-})
 
 router.get('/consProds',(req, res) => {
     sql.query(`SELECT * FROM producto`, (sqlErr, sqlRes) => {
@@ -119,8 +110,59 @@ router.get('/ConsNV', (req, res) => {
         res.send(sqlRes)
     })
 })
-router.get('/consProv',(req,res) => {
+
+router.get('/consProveedores',(req,res) => {
     sql.query(`SELECT * FROM proveedor`,(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+
+router.post('/ConsProv', 
+[
+    body('idProv').not().isEmpty().isInt()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)})
+        return
+    }
+    let body = req.body
+    sql.query(`SELECT * FROM proveedor WHERE id_proveedor=?`, [body.idProv], (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+
+router.get('/ConsEditoriales',(req, res) => {
+    sql.query(`SELECT * FROM editorial`, (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+
+router.post('/ConsEditorial', 
+[
+    body('idEdit').not().isEmpty().isInt()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)})
+        return
+    }
+    let body = req.body
+    sql.query(`SELECT * FROM editorial WHERE id_editorial=?`, [body.idEdit], (sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({success:false, err: sqlErr.message})
             return
