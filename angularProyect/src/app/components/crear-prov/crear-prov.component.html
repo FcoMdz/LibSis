@@ -13,10 +13,15 @@
               <li class="list-group-item">
                 <div class="input-group">
                   <label class="input-group-text" for="options">Proveedor</label>
-                  <select class="form-select" id="options">
-                    <option value="0" selected>Nuevo Proveedor</option>
-                    <option *ngFor="let Proveedor of proveedores" value="{{ Proveedor.idProv }}">{{proveedores.idprov}}</option>
-                  </select>
+                  <p-dropdown
+                    class="form-control"
+                    [options] = "proveedores"
+                    optionLabel="nombre"
+                    [filter] = "true"
+                    filterBy = "nombre"
+                    [showClear]="true"
+                    placeholder="Seleccione un proveedor"
+                  ></p-dropdown>
                 </div>
               </li>
 

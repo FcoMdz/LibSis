@@ -68,7 +68,7 @@ export class CrearProvComponent implements OnInit {
         let body = {
           idProv: this.options.value
         }
-        this.sql.alta(this.sql.URL + "/consProv", body)
+        this.sql.consulta(this.sql.URL + "/consulta/consProv")
           .then((datosProv) => {
             this.loadProv(datosProv);
           });
@@ -99,6 +99,7 @@ export class CrearProvComponent implements OnInit {
   async consProveedores() {
     let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProv")
     consulta.forEach((proveedor:any) => {
+      console.log(proveedor)
       this.proveedores = proveedor;
     });
   }
