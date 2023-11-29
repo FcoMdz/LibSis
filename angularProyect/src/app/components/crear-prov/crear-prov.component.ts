@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SQLService, res } from 'src/app/services/sql.service';
 import { FormControl, Validators, FormGroup } from "@angular/forms";
+import { DropdownChangeEvent } from "primeng/dropdown"
 import Swal from 'sweetalert2';
 
 @Component({
@@ -10,16 +11,13 @@ import Swal from 'sweetalert2';
 })
 export class CrearProvComponent implements OnInit {
   usuario: any = sessionStorage.getItem('usuario');
-  options!: HTMLSelectElement;
-  nombre!: HTMLInputElement;
-  telefono!: HTMLInputElement;
-  rfc!: HTMLInputElement;
   btnReg!: HTMLButtonElement;
   proveedores!:any;
+  option!:proveedor
 
   formUser = new FormGroup({
     'nombre': new FormControl('', [Validators.required]),
-    'telefono': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
+    'telefono': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$'),Validators.maxLength(10)]),
     'rfc': new FormControl('', [Validators.required, Validators.maxLength(13)]),
   });
 
@@ -29,12 +27,7 @@ export class CrearProvComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.getData();
-    this.options = <HTMLSelectElement>document.getElementById("options")!;
-    this.nombre = <HTMLInputElement>document.getElementById("nombre")!;
-    this.telefono = <HTMLInputElement>document.getElementById("telefono")!;
-    this.rfc = <HTMLInputElement>document.getElementById("rfc")!;
     this.btnReg = <HTMLButtonElement>document.getElementById("btnReg")!;
-    this.initListeners();
   }
 
   async getData() {
@@ -42,51 +35,42 @@ export class CrearProvComponent implements OnInit {
   }
 
   limpiarFormulario() {
-    this.nombre.value = "";
-    this.telefono.value = "";
-    this.rfc.value = "";
+    this.formUser.reset()
     this.btnReg.innerHTML = '<i class="fa-solid fa-book"></i> Registrar <i class="fa-solid fa-book"></i>';
     this.btnReg.disabled = true;
   }
 
   loadProv(datosProv: any) {
-    let datos = <proveedor>datosProv;
+    let datos = <proveedor>datosProv[0];
     let prov = datos;
     if (prov) {
       this.btnReg.disabled = false;
-      this.nombre.value = prov.nombre;
-      this.telefono.value = prov.telefono.toString();
-      this.rfc.value = prov.rfc.toString();
+      this.formUser.controls.nombre.setValue(prov.nombre)
+      this.formUser.controls.telefono.setValue(prov.telefono)
+      this.formUser.controls.rfc.setValue(prov.RFC)
       this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
   
     }
   }
 
-  initListeners() {
-    this.options.addEventListener('change', (event) => {
-      if (this.options.value != "0") {
-        let body = {
-          idProv: this.options.value
-        }
-        this.sql.consulta(this.sql.URL + "/consulta/consProv")
-          .then((datosProv) => {
+  changeListener(evento:DropdownChangeEvent) {
+    if (evento.value != null && evento.value.id_proveedor != "0") {
+      let body = {
+        idProv: evento.value.id_proveedor
+      }
+      this.sql.alta(this.sql.URL + "/consulta/ConsProv", body)
+        .then((datosProv) => {
+          if(datosProv!=undefined){
+            this.option = (<proveedor[]>datosProv)[0]
             this.loadProv(datosProv);
-          });
-      } else {
-        this.limpiarFormulario();
-      }
-    });
-
-  }
-
-  changeSelections(selection: HTMLSelectElement, array: any[]) {
-    for (let i = 0; i < selection.options.length; i++) {
-      const element = selection.options[i];
-      if (element.selected) {
-        array.push(element.value);
-      }
+          }
+        });
+    } else {
+      this.option = this.proveedores[0]
+      this.limpiarFormulario();
     }
   }
+
 
   deleteSelections(selection: HTMLSelectElement, array: any[]) {
     array = [];
@@ -97,22 +81,30 @@ export class CrearProvComponent implements OnInit {
   }
 
   async consProveedores() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProv")
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProveedores")
     consulta.forEach((proveedor:any) => {
       console.log(proveedor)
       this.proveedores = proveedor;
+      this.proveedores.splice(0, 0, <proveedor>{
+        nombre: "Nuevo proveedor",
+        telefono: "",
+        RFC: "",
+        id_proveedor: "0"
+      })
     });
   }
 
 
   registrarProv() {
     let body = {
-      nombre: this.nombre.value,
-      telefono: this.telefono.value,
-      rfc: this.rfc.value,
+      idProv: this.option.id_proveedor,
+      nombre: this.formUser.controls.nombre.value,
+      telefono: this.formUser.controls.telefono.value?.toString(),
+      rfc: this.formUser.controls.rfc.value,
     }
-    if (this.options.value == "0") {
-      this.sql.alta(this.sql.URL + "/alta/RegProv", body).then((res) => {
+    console.log(body)
+    if (this.option.id_proveedor == "0") {
+      this.sql.alta(this.sql.URL + "/alta/Prov", body).then((res) => {
         let respuesta = <res>res;
         if (respuesta.success) {
           Swal.fire('Registro', 'Se ha registrado correctamente el proveedor', 'success');
@@ -123,7 +115,7 @@ export class CrearProvComponent implements OnInit {
         }
       })
     } else {
-      this.sql.alta(this.sql.URL + "/ActProv", body).then((res) => {
+      this.sql.alta(this.sql.URL + "/cambio/Prov", body).then((res) => {
         let respuesta = <res>res;
         if (respuesta.success) {
           Swal.fire('Actualizar', 'Se ha actualizado correctamente el proveedor', 'success');
@@ -135,16 +127,12 @@ export class CrearProvComponent implements OnInit {
 
       });
     }
-
   }
-
-
-
 }
 
 interface proveedor {
-  success: boolean;
   nombre: string;
-  telefono: number;
-  rfc: number;
+  telefono: string;
+  RFC: string;
+  id_proveedor: string;
 }

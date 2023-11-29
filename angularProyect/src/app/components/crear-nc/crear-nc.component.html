@@ -1,4 +1,4 @@
-<div class="container" *ngIf=" usuario && (usuario.vendedor || usuario.admin); else iniciarSesion">
+<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.admin); else iniciarSesion">
     <div class="row text-center">
       <div class="col-12">
         <h2>REGISTRAR NOTA DE COPMPRA</h2>
@@ -10,30 +10,46 @@
           <div class="card-header">
             Ingrese los siguientes datos
           </div>
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item">
-                <div class="input-group">
-                  <label class="input-group-text" for="Proveedores">Proveedor</label>
-                  <select class="form-select" id="Proveedores">
-                    <option value="0" selected>Selecciona el Proveedor</option>
-                    <option *ngFor="let Proveedor of Proveedores" value="{{ Proveedor.idProveedor }}">{{Proveedor.idProveedor}}</option>
-                  </select>
-                </div>
-              </li>
-            </ul>
-          </div>
-  
+
           <form action="" [formGroup]="formUser">
             <div class="card-body">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                   <div class="input-group">
-                    <label class="input-group-text" for="options">Productos</label>
-                    <select class="form-select" id="options">
-                      <option value="0" selected>Selecciona un producto</option>
-                      <option *ngFor="let producto of productos" value="{{ producto.ISBN }}">{{producto.nombre}}</option>
-                    </select>
+                    <label class="input-group-text" for="optionsProv">Proveedor</label>
+                    <span style="width: 78%;">
+                      <p-dropdown
+                        inputId="optionsProv"
+                        (onChange)="changeListenerProv($event)"
+                        styleClass="w-100"
+                        [disabled] = "deshabilitarPrv()"
+                        [options] = "proveedores"
+                        optionLabel="nombre"
+                        [filter] = "true"
+                        filterBy = "nombre"
+                        [showClear]="true"
+                        placeholder="Seleccione un proveedor"
+                      ></p-dropdown>
+                    </span>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="input-group">
+                    <label class="input-group-text" for="optionsProd">Producto</label>
+                    <span style="width: 80%;">
+                      <p-dropdown
+                        inputId="optionsProd"
+                        (onChange)="changeListenerProd($event)"
+                        styleClass="w-100"
+                        [options] = "productos"
+                        optionLabel="nombre"
+                        [filter] = "true"
+                        filterBy = "nombre"
+                        [showClear]="true"
+                        placeholder="Seleccione un producto"
+                      ></p-dropdown>
+                    </span>
+                    
                   </div>
                 </li>
   
@@ -41,47 +57,51 @@
                   <div class="input-group">
                     <label class="input-group-text" for="precio" id="basic-addon1">Precio $</label>
                     <input id="precio" type="text" class="form-control" placeholder="000.00" aria-label="Username"
-                      aria-describedby="basic-addon1" step=".01" disabled />
+                      aria-describedby="basic-addon1" formControlName="precio"/>
+                  </div>
+                  <div class="alert alert-danger mt-2"
+                    [hidden]="formUser.get('precio')?.valid || formUser.get('precio')?.pristine">
+                    <span *ngIf="formUser.get('precio')?.errors?.['pattern']">
+                      El precio puede variar desde $0.00 hasta $99999.99
+                    </span>
                   </div>
                 </li>
                 <li class="list-group-item">
                   <div class="input-group">
                     <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto %</label>
-                    <input id="impuesto" type="text" class="form-control" placeholder="000.00" aria-label="Username"
-                      aria-describedby="basic-addon1" step=".01" disabled />
+                    <input id="impuesto" type="text" class="form-control" placeholder="00" aria-label="Username"
+                      aria-describedby="basic-addon1" formControlName="impuesto" />
                   </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="input-group">
-                    <label class="input-group-text" id="basic-addon1">Existencias</label>
-                    <input type="number" min="0" class="form-control" placeholder="Ej. 1" aria-label="Username"
-                      [value]="existencias" disabled aria-describedby="basic-addon1" />
+                  <div class="alert alert-danger mt-2"
+                    [hidden]="formUser.get('impuesto')?.valid || formUser.get('impuesto')?.pristine">
+                    <span *ngIf="formUser.get('impuesto')?.errors?.['pattern']">
+                      El impuesto es un porcentaje que va del 0% al 99%
+                    </span>
                   </div>
                 </li>
                 <li class="list-group-item">
                   <div class="input-group">
                     <label for="cant" class="input-group-text" id="basic-addon1">Cantidad</label>
-                    <input id="cant" type="text" [(ngModel)]="cantidad" max="{{cantidadMax}}" min="0" class="form-control"
-                      formControlName="cantidad" placeholder="Ej. 1" aria-label="Username"
+                    <input id="cant" type="text" min="1" class="form-control"
+                      formControlName="cantidad" placeholder="Ej. 1" aria-label="Cantidad"
                       aria-describedby="basic-addon1" />
+                  </div>
+                  <div class="alert alert-danger mt-2"
+                    [hidden]="formUser.get('cantidad')?.valid || formUser.get('cantidad')?.pristine">
+                    <span *ngIf="formUser.get('cantidad')?.errors?.['pattern']">
+                      La cantidad solo puede contener numeros enteros.
+                    </span>
                   </div>
                 </li>
               </ul>
-  
-              <div class="alert alert-danger mt-2"
-                [hidden]="formUser.get('cantidad')?.valid || formUser.get('cantidad')?.pristine">
-                <span *ngIf="formUser.get('cantidad')?.errors?.['pattern']">
-                  La cantidad solo puede contener numeros enteros.
-                </span>
-              </div>
-  
+              
             </div>
             <div class="card-footer text-center">
               <div class="row">
                 <div class="col-6"><button class="btn btn-outline-primary" style="width: 100%;"
                     (click)="agregarProducto()" [disabled]="formUser.invalid"><i class="fa-solid fa-circle-plus"></i>
                     Agregar <i class="fa-solid fa-circle-plus"></i></button></div>
-                <div class="col-6"><button class="btn btn-outline-success" style="width: 100%;" (click)="cargarNV()"
+                <div class="col-6"><button class="btn btn-outline-success" style="width: 100%;" (click)="cargarNC()"
                     [disabled]="formUser.invalid"><i class="fa-solid fa-receipt"></i> Registrar <i
                       class="fa-solid fa-receipt"></i></button></div>
               </div>

@@ -300,6 +300,7 @@ router.post("/Prov",
     let body = req.body
     sql.query(`UPDATE proveedor SET nombre=?,telefono=?,RFC=? WHERE id_proveedor=?`, [body.nombre,body.telefono,body.rfc, body.idProv],(sqlErr,sqlRes) => {
         if(sqlErr){
+            console.log(sqlErr)
             res.send({
                     success:false, 
                     err: sqlErr.message
@@ -327,7 +328,7 @@ router.post("/Edit",
         return
     }
     let body = req.body
-    sql.query(`UPDATE editorial SET nombre=?,telefono=? WHERE id_proveedor=?`, [body.nombre,body.telefono, body.idProv],(sqlErr,sqlRes) => {
+    sql.query(`UPDATE editorial SET nombre=?,telefono=? WHERE id_editorial=?`, [body.nombre,body.telefono, body.idEdit],(sqlErr,sqlRes) => {
         if(sqlErr){
             res.send({
                     success:false, 

@@ -15,6 +15,8 @@ import { SQLService } from './services/sql.service';
 import { CrearNcComponent } from './components/crear-nc/crear-nc.component';
 import { CrearProvComponent } from './components/crear-prov/crear-prov.component';
 import { DropdownModule } from 'primeng/dropdown';
+import { CrearEdComponent } from './components/crear-ed/crear-ed.component';
+import { ConsultarNcComponent } from './components/consultar-nc/consultar-nc.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,8 @@ import { DropdownModule } from 'primeng/dropdown';
     LoginComponent,
     CrearNcComponent,
     CrearProvComponent,
+    CrearEdComponent,
+    ConsultarNcComponent,
 
   ],
   imports: [

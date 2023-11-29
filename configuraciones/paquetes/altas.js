@@ -158,17 +158,14 @@ router.post('/NC',
             let productosAgregar = body.ISBNProds
             productosAgregar = JSON.parse(productosAgregar)
             let productos = []
-            productosGeneral.forEach(producto => {
-                let i = productosAgregar.map((e) => {return e.ISBN}).indexOf(producto.ISBN)
-                if(i!=-1){
-                    let data = {
-                        ISBN: producto.ISBN,
-                        costo: (productosAgregar[i].costo/(1+(productosAgregar[i].impuesto/100))).toFixed(2),
-                        cantidad: productosAgregar[i].cant,
-                        impuesto: (productosAgregar[i].costo - (productosAgregar[i].costo/(1+(productosAgregar[i].impuesto/100)))).toFixed(2)
-                    }
-                    productos.push(data)
+            productosAgregar.forEach(producto => {
+                let data = {
+                    ISBN: producto.ISBN,
+                    costo: producto.costo,
+                    cantidad: producto.cant,
+                    impuesto: producto.impuesto
                 }
+                productos.push(data)
             })
             var d = new Date()
             d.setTime(d.getTime() - (/* UTC-6 */ 6) * 60 * 60 * 1000)
@@ -180,23 +177,23 @@ router.post('/NC',
                             err: sqlErr1.message
                         })
                     return
-                }
-                let folioNC = sqlRes1.insertId
-                productos.forEach(producto => {
-                    sql.query(`INSERT INTO detallenc VALUES (?, ?, ?, ?, ?)`, [producto.ISBN, folioNC, producto.costo, producto.cantidad, producto.impuesto], (sqlErr2, sqlRes2) => {
-                        if(sqlErr2){
-                            res.send({
-                                success: false,
-                                err: sqlErr2.message
-                            })
-                            return
-                        }
-                        res.send({success:true, id: sqlRes1.insertId})
-                        sql.commit()
+                }else{
+                    let folioNC = sqlRes1.insertId
+                    productos.forEach(producto => {
+                        sql.query(`INSERT INTO detallenc VALUES (?, ?, ?, ?, ?)`, [producto.ISBN, folioNC, producto.costo, producto.cantidad, producto.impuesto], (sqlErr2, sqlRes2) => {
+                            if(sqlErr2){
+                                res.send({
+                                    success: false,
+                                    err: sqlErr2.message
+                                })
+                                return
+                            }else{
+                                sql.commit()
+                                res.send({success:true, id: sqlRes1.insertId})
+                            }
+                        })
                     })
-                })
-
-                
+                }
             })
         }
     })

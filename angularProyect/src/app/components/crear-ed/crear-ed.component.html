@@ -1,7 +1,7 @@
 <div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.admin); else iniciarSesion">
     <div class="row text-center">
       <div class="col-12">
-        <h2>REGISTRO DE PROVEEDORES</h2>
+        <h2>REGISTRO DE EDITORIALES</h2>
       </div>
     </div>
     <div class="row justify-content-center">
@@ -12,29 +12,27 @@
             <ul class="list-group list-group-flush">
               <li class="list-group-item">
                 <div class="input-group">
-                  <label class="input-group-text" for="options">Proveedor</label>
-                  <span style="width: 83.8%;">
+                  <label class="input-group-text" for="options">Editorial</label>
+                  <span style="width: 86.3%;">
                     <p-dropdown
-                      inputId="options"
-                      (onChange)="changeListener($event)"
                       styleClass="w-100"
-                      [options] = "proveedores"
+                      (onChange)="changeListener($event)"
+                      [options] = "editoriales"
                       optionLabel="nombre"
                       [filter] = "true"
                       filterBy = "nombre"
                       [showClear]="true"
-                      placeholder="Seleccione un proveedor"
+                      placeholder="Seleccione una editorial"
                     ></p-dropdown>
                   </span>
-                  
                 </div>
               </li>
 
               <li class="list-group-item">
                 <div class="input-group">
                   <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
-                  <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre del proveedor"
-                    aria-label="Nombre producto" aria-describedby="basic-addon1" id="nombre" required />
+                  <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre de la editorial"
+                    aria-label="Nombre editorial" aria-describedby="basic-addon1" id="nombre" required />
                 </div>
   
                 <div class="alert alert-danger mt-2"
@@ -47,7 +45,7 @@
               </li>
               <li class="list-group-item">
                 <div class="input-group">
-                  <label class="input-group-text" for="telefono" id="basic-addon1">Teléfono</label>
+                  <label class="input-group-text" for="telefono" id="basic-addon1">telefono</label>
                   <input type="text" class="form-control" formControlName="telefono" placeholder="XXX - XXX - XXXX"
                     aria-label="Nombre producto" aria-describedby="basic-addon1" id="telefono" required />
                 </div>
@@ -66,28 +64,10 @@
                 </div>
   
               </li>
-              <li class="list-group-item">
-                <div class="input-group">
-                  <label for="rfc" class="input-group-text" id="basic-addon1">RFC</label>
-                  <input type="text" class="form-control" formControlName="rfc" placeholder="XXXXXXXXXXXXX"
-                    aria-label="Username" aria-describedby="basic-addon1" id="rfc" required />
-                </div>
-  
-                <div class="alert alert-danger mt-2"
-                  [hidden]="formUser.get('rfc')?.valid || formUser.get('rfc')?.pristine">
-                  <span *ngIf="formUser.get('rfc')?.errors?.['required']">
-                    El RFC es requerido.
-                  </span>
-                  <span *ngIf="formUser.get('rfc')?.errors?.['maxlength']">
-                    El RFC no puede ser mayor a 13 caracteres.
-                  </span>
-                </div>
-  
-              </li>
             </ul>
           </div>
           <div class="text-center my-2">
-            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProv()" id="btnReg"
+            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarEd()" id="btnReg"
               [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar 
               <i class="fa-solid fa-book"></i></button>
           </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SQLService, res } from 'src/app/services/sql.service';
 import Swal from 'sweetalert2';
+import { DropdownChangeEvent } from "primeng/dropdown"
 import { FormGroup, FormControl, Validators } from "@angular/forms";
 @Component({
   selector: 'app-crear-nc',
@@ -10,22 +11,19 @@ import { FormGroup, FormControl, Validators } from "@angular/forms";
 export class CrearNcComponent implements OnInit {
   usuario: any = sessionStorage.getItem('usuario');
   productos: any;
-  options!: HTMLSelectElement;
-  cliente!: HTMLSelectElement;
   cantidad!: number;
   Proveedores!: any;
-  precio!: HTMLSelectElement;
-  cantidadMax!: number;
-  Cte!: number;
-  impuesto!: HTMLSelectElement;
   campos: venderProducto[] = [];
   campo: venderProducto = new venderProducto();
   total: number = 0;
   subtotal: number = 0;
   impuestosTotal: number = 0;
-  existencias: number = 0;
-
+  proveedores!:any;
+  optionProv!:proveedor|null
+  optionProd!:producto|null
   formUser = new FormGroup({
+    'precio': new FormControl('', [Validators.pattern('^[0-9]{1,5}.[0-9]{2}$')]),
+    'impuesto': new FormControl('', [Validators.pattern('^[0-9]{1,2}$')]),
     'cantidad': new FormControl('', Validators.pattern('^[0-9]*$'))
   });
 
@@ -35,18 +33,45 @@ export class CrearNcComponent implements OnInit {
   }
   async ngOnInit(): Promise<void> {
     await this.consProductos();
-    await this.consClientes();
-    this.options = <HTMLSelectElement>document.getElementById("options")!;
-    this.precio = <HTMLSelectElement>document.getElementById("precio")!;
-    this.impuesto = <HTMLSelectElement>document.getElementById("impuesto")!;
-    this.cliente = <HTMLSelectElement>document.getElementById("clientes")!;
-    this.initListeners();
+    await this.consProveedores();
   }
 
-  async consClientes() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consCte");
-    consulta.forEach((cte) => {
-      this.Proveedores = cte;
+  changeListenerProv(evento:DropdownChangeEvent) {
+    if (evento.value != null && evento.value.id_proveedor != "0") {
+      let body = {
+        idProv: evento.value.id_proveedor
+      }
+      this.sql.alta(this.sql.URL + "/consulta/ConsProv", body)
+        .then((datosProv) => {
+          if(datosProv!=undefined){
+            this.optionProv = (<proveedor[]>datosProv)[0]
+          }
+        });
+    } else {
+      this.optionProv = null;
+    }
+  }
+
+  changeListenerProd(evento:DropdownChangeEvent) {
+    if (evento.value != null && evento.value.ISBN != "0") {
+      let body = {
+        ISBN: evento.value.ISBN
+      }
+      this.sql.alta(this.sql.URL + "/consulta/consProd", body)
+        .then((datosProd:any) => {
+          if(datosProd!=undefined){
+            this.optionProd = <producto>datosProd.producto
+          }
+        });
+    } else {
+      this.optionProd = null;
+    }
+  }
+
+  async consProveedores() {
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProveedores")
+    consulta.forEach((proveedor:any) => {
+      this.proveedores = proveedor;
     });
   }
 
@@ -57,81 +82,40 @@ export class CrearNcComponent implements OnInit {
     });
   }
 
-  initListeners() {
-    this.options.addEventListener('change', (event) => {
-      if (this.options.value != "0") {
-        let body = {
-          ISBN: this.options.value
-        }
-        this.sql.alta(this.sql.URL + "/consulta/consProd", body)
-          .then((datosProducto) => {
-            let producto = <datosProducto>datosProducto;
-            let resultado = producto.producto;
-            if (resultado) {
-              this.existencias = resultado.existencias;
-              this.precio.value = resultado.precio.toFixed(2);
-              this.cantidadMax = parseInt(resultado.existencias.toString());
-              this.impuesto.value = resultado.impuesto.toString();
-              this.campo.ISBN = resultado.ISBN;
-              this.campo.impuesto = (resultado.precio - (resultado.precio / (1 + (resultado.impuesto / 100)))).toFixed(2);
-              this.campo.precio = (resultado.precio / (1 + (resultado.impuesto / 100))).toFixed(2);
-              this.campo.nombre = resultado.nombre.toString();
-            }
-          });
-      } else {
-        this.limpiarCampos();
-      }
-    })
-  }
-
   limpiarCampos() {
-    this.existencias = 0;
-    this.options.selectedIndex = 0;
-    this.cantidad = 0;
-    this.precio.value = "";
-    this.cantidadMax = 0;
-    this.impuesto.value = "";
-    this.campo.ISBN = "";
-    this.campo.impuesto = "";
-    this.campo.precio = "";
-    this.campo.nombre = "";
+    this.formUser.reset()
   }
 
-  cargarNV() {
-    this.Proveedores.forEach((element: any) => {
-      if (element.id_cte == this.cliente.options[this.cliente.selectedIndex].value) {
-        this.Cte = element.id_cte;
-      }
-    });
-    let ISBNS: { ISBN: string, cant: string }[] = [];
+  cargarNC() {
+    let ISBNS: { ISBN: string, cant: string, costo:String, impuesto:String }[] = [];
     this.campos.forEach(element => {
       ISBNS.push({
         ISBN: element.ISBN,
-        cant: element.cantidad
+        cant: element.cantidad,
+        costo: element.precio,
+        impuesto: element.impuesto
       });
     });
-    let body = {
-      idCte: this.Cte,
-      ISBNProds: JSON.stringify(ISBNS)
-    }
-    if (!this.Cte || this.Cte == 0) {
-      Swal.fire('Registro', 'Debe seleccionar un cliente para realizar la nota de venta', 'info');
+    if (!this.optionProv || this.optionProv.id_proveedor == "0") {
+      Swal.fire('Registro', 'Debe seleccionar un proveedor para realizar la nota de compra', 'info');
       return;
     }
     if (this.campos.length <= 0) {
-      Swal.fire('Registro', 'Debe agregar productos para registrar la nota de venta', 'info');
+      Swal.fire('Registro', 'Debe agregar productos para registrar la nota de compra', 'info');
       return;
     }
-    this.sql.alta(this.sql.URL + "/alta/NV", body)
+    let body = {
+      idProv: this.optionProv.id_proveedor,
+      ISBNProds: JSON.stringify(ISBNS)
+    }
+    this.sql.alta(this.sql.URL + "/alta/NC", body)
       .then((res) => {
-        console.log(res)
         let resultado = <res>res;
         if (!resultado.success) {
-          Swal.fire('Regisrar', 'Error al reigstrar la nota de venta: ' + resultado.err, 'error');
+          Swal.fire('Regisrar', 'Error al reigstrar la nota de compra: ' + resultado.err, 'error');
           return;
         }
-        Swal.fire('Registrar', 'Se ha registrado correctamente la nota de venta con Folio: ' + resultado.id, 'success').then(() => {
-          this.cliente.selectedIndex = 0;
+        Swal.fire('Registrar', 'Se ha registrado correctamente la nota de compra con Folio: ' + resultado.id, 'success').then(() => {
           this.limpiarCampos();
           this.campos = [];
           this.actualizarTotales();
@@ -149,41 +133,43 @@ export class CrearNcComponent implements OnInit {
     this.actualizarTotales();
   }
 
+  deshabilitarPrv():boolean{
+    if(this.campos.length > 0) return true
+    return false
+  }
+
   agregarProducto() {
-    if (this.campo) {
-      if (!this.campo.ISBN) {
+    if (this.formUser.valid) {
+      if (!this.optionProd?.ISBN) {
         Swal.fire('Agregar', 'Debe seleccionar un producto para agregar', 'info');
         return;
       }
-      if (!this.cantidad || this.cantidad == 0) {
-        Swal.fire('Agregar', 'Debe ingresar una cantidad para agregar', 'info');
+      if (!this.formUser.controls.cantidad.value || !this.formUser.controls.precio.value || !this.formUser.controls.impuesto.value) {
+        Swal.fire('Agregar', 'Debe ingresar los campos para poder agragar', 'info');
         return;
       }
-      this.campo.cantidad = this.cantidad.toString();
-      this.productos.forEach((producto: any) => {
-        if (producto.ISBN != this.campo.ISBN) return;
-        if (producto.existencias < parseInt(this.campo.cantidad)) {
-          Swal.fire('Agregar', 'Las existencias del producto son menores a la cantidad seleccionada, existencias actuales: ' + producto.existencias, 'error');
-          return;
-        }
-        for (let i = 0; i < this.campos.length; i++) {
-          const element = this.campos[i];
-          if (element.ISBN == producto.ISBN) {
-            if ((parseInt(this.campo.cantidad) + parseInt(element.cantidad)) <= producto.existencias) {
-              element.cantidad = (parseInt(this.campo.cantidad) + parseInt(element.cantidad)).toString();
-              this.actualizarTotales();
-              return;
-            } else {
-              Swal.fire('Agregar', 'Las existencias del producto son menores a la cantidad seleccionada con los elementos ya agregados, existencias actuales: ' + producto.existencias, 'error');
-              return;
-            }
+      this.campo.ISBN = this.optionProd?.ISBN
+      this.campo.cantidad = this.formUser.controls.cantidad.value!
+      this.campo.nombre = this.optionProd?.nombre
+      this.campo.impuesto = (parseFloat(this.formUser.controls.precio.value!) / (1 + parseInt(this.formUser.controls.impuesto.value!))).toFixed(2).toString()
+      this.campo.precio = (parseFloat(this.formUser.controls.precio.value!) - parseFloat(this.campo.impuesto)).toFixed(2).toString()
+      if(this.campos.length != 0){
+        this.campos.forEach((producto: venderProducto) => {
+          if (producto.ISBN != this.campo.ISBN) return;
+          if (producto.impuesto == this.campo.impuesto && producto.precio == this.campo.precio){
+            this.campos[this.campos.indexOf(producto)].cantidad = 
+            (parseInt(this.campos[this.campos.indexOf(producto)].cantidad) +
+            parseInt(this.campo.cantidad)).toString();
+          }else{
+            this.campos.push(new venderProducto(this.campo));
           }
-        }
+          return;
+        });
+      }else{
         this.campos.push(new venderProducto(this.campo));
-        this.actualizarTotales();
-        return;
-      });
-
+      }
+      this.actualizarTotales();
+      
     }
   }
 
@@ -239,3 +225,10 @@ class venderProducto {
 }
 
 
+
+interface proveedor {
+  nombre: string;
+  telefono: string;
+  RFC: string;
+  id_proveedor: string;
+}
