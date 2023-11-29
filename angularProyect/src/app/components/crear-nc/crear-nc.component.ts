@@ -22,7 +22,7 @@ export class CrearNcComponent implements OnInit {
   optionProv!:proveedor|null
   optionProd!:producto|null
   formUser = new FormGroup({
-    'precio': new FormControl('', [Validators.pattern('^[0-9]{1,5}.[0-9]{2}$')]),
+    'precio': new FormControl('', [Validators.pattern('^[0-9]{0,5}(.[0-9]{2})?$')]),
     'impuesto': new FormControl('', [Validators.pattern('^[0-9]{1,2}$')]),
     'cantidad': new FormControl('', Validators.pattern('^[0-9]*$'))
   });
@@ -140,6 +140,10 @@ export class CrearNcComponent implements OnInit {
 
   agregarProducto() {
     if (this.formUser.valid) {
+      if (!this.optionProv?.RFC) {
+        Swal.fire('Agregar', 'Debe seleccionar un proveedor para agregar productos', 'info');
+        return;
+      }
       if (!this.optionProd?.ISBN) {
         Swal.fire('Agregar', 'Debe seleccionar un producto para agregar', 'info');
         return;
@@ -151,20 +155,25 @@ export class CrearNcComponent implements OnInit {
       this.campo.ISBN = this.optionProd?.ISBN
       this.campo.cantidad = this.formUser.controls.cantidad.value!
       this.campo.nombre = this.optionProd?.nombre
-      this.campo.impuesto = (parseFloat(this.formUser.controls.precio.value!) / (1 + parseInt(this.formUser.controls.impuesto.value!))).toFixed(2).toString()
-      this.campo.precio = (parseFloat(this.formUser.controls.precio.value!) - parseFloat(this.campo.impuesto)).toFixed(2).toString()
+      this.campo.precio = (parseFloat(this.formUser.controls.precio.value!) / (1 + parseInt(this.formUser.controls.impuesto.value!)*.01)).toFixed(2).toString()
+      this.campo.impuesto = (parseFloat(this.formUser.controls.precio.value!) - parseFloat(this.campo.precio)).toFixed(2).toString()
+
       if(this.campos.length != 0){
+        var flag:boolean = true;
         this.campos.forEach((producto: venderProducto) => {
           if (producto.ISBN != this.campo.ISBN) return;
           if (producto.impuesto == this.campo.impuesto && producto.precio == this.campo.precio){
             this.campos[this.campos.indexOf(producto)].cantidad = 
             (parseInt(this.campos[this.campos.indexOf(producto)].cantidad) +
             parseInt(this.campo.cantidad)).toString();
-          }else{
-            this.campos.push(new venderProducto(this.campo));
+            flag = false;
           }
           return;
         });
+        if(flag){
+          this.campos.push(new venderProducto(this.campo));
+          flag = false;
+        }
       }else{
         this.campos.push(new venderProducto(this.campo));
       }

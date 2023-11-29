@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { SQLService, res } from 'src/app/services/sql.service';
 import { FormControl, Validators, FormGroup } from "@angular/forms";
 import Swal from 'sweetalert2';
+import { DropdownChangeEvent } from 'primeng/dropdown';
+import { MultiSelectChangeEvent } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-registrar',
@@ -10,29 +12,20 @@ import Swal from 'sweetalert2';
 })
 export class RegistrarComponent implements OnInit {
   usuario: any = sessionStorage.getItem('usuario');
-  options!: HTMLSelectElement;
-  ISBN!: HTMLInputElement;
-  nombre!: HTMLInputElement;
-  precio!: HTMLInputElement;
-  cantidad!: HTMLInputElement;
-  impuesto!: HTMLInputElement;
   btnReg!: HTMLButtonElement;
-  editorial!: HTMLSelectElement;
-  autor!: HTMLSelectElement;
-  productos!: any;
-  editoriales!: any;
-  autores!: any;
+  optionProd!:datosProducto|null
   editorialesSelected: any[] = [];
   autoresSelected: any[] = [];
   editorialesPreSelected: any[] = [];
   autoresPreSelected: any[] = [];
   existencias: number = 0;
-
+  productos: any = []
+  autores: any = []
+  editoriales: any = []
   formUser = new FormGroup({
     'isbn': new FormControl('', [Validators.required, Validators.minLength(13), Validators.maxLength(13), Validators.pattern('^[0-9]*$')]),
     'nombre': new FormControl('', [Validators.required]),
     'precio': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
-    'existencias': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
     'impuesto': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
   });
 
@@ -40,17 +33,42 @@ export class RegistrarComponent implements OnInit {
     if (this.usuario) this.usuario = JSON.parse(this.usuario);
   }
 
+  changeListenerProd(evento:DropdownChangeEvent) {
+    if (evento.value != null && evento.value.ISBN != "0") {
+      let body = {
+        ISBN: evento.value.ISBN
+      }
+      this.sql.alta(this.sql.URL + "/consulta/consProd", body)
+        .then((datosProd:any) => {
+          if(datosProd!=undefined){
+            this.optionProd = <datosProducto>datosProd
+            console.log(this.optionProd)
+            this.loadProducto(this.optionProd)
+          }
+        });
+    } else {
+      this.optionProd = null;
+    }
+  }
+
+  loadProducto(dataProd: datosProducto){
+    this.formUser.controls.isbn.setValue(dataProd.producto.ISBN)
+    this.formUser.controls.nombre.setValue(dataProd.producto.nombre)
+    this.formUser.controls.precio.setValue(dataProd.producto.precio.toString())
+    this.formUser.controls.impuesto.setValue(dataProd.producto.impuesto.toString())
+  }
+
+  changeListenerEdit(evento: MultiSelectChangeEvent){
+    console.log(evento)
+  }
+
+  changeListenerAut(evento: MultiSelectChangeEvent){
+    console.log(evento)
+  }
+
   async ngOnInit(): Promise<void> {
     await this.getData();
-    this.options = <HTMLSelectElement>document.getElementById("options")!;
-    this.ISBN = <HTMLInputElement>document.getElementById("isbn")!;
-    this.nombre = <HTMLInputElement>document.getElementById("nombre")!;
-    this.precio = <HTMLInputElement>document.getElementById("precio")!;
-    this.cantidad = <HTMLInputElement>document.getElementById("cantidad")!;
-    this.impuesto = <HTMLInputElement>document.getElementById("impuesto")!;
     this.btnReg = <HTMLButtonElement>document.getElementById("btnReg")!;
-    this.editorial = <HTMLSelectElement>document.getElementById("editorial")!;
-    this.autor = <HTMLSelectElement>document.getElementById("autor")!;
     this.initListeners();
   }
 
@@ -61,68 +79,16 @@ export class RegistrarComponent implements OnInit {
   }
 
   limpiarFormulario() {
-    this.ISBN.removeAttribute('disabled');
-    this.ISBN.value = "";
-    this.nombre.value = "";
-    this.precio.value = "";
-    this.cantidad.value = "";
-    this.cantidad.min = "";
-    this.impuesto.value = "";
     this.btnReg.innerHTML = '<i class="fa-solid fa-book"></i> Registrar <i class="fa-solid fa-book"></i>';
-    this.deleteSelections(this.editorial, this.editorialesSelected);
-    this.deleteSelections(this.autor, this.autoresSelected);
+    this.formUser.reset()
     this.editorialesSelected = [];
     this.autoresSelected = [];
     this.existencias = 0;
     this.btnReg.disabled = true;
   }
 
-  loadProducto(datosProducto: any) {
-    let datos = <datosProducto>datosProducto;
-    let producto = datos.producto;
-    this.autoresPreSelected = datos.autores;
-    this.editorialesPreSelected = datos.editoriales;
-    if (producto) {
-      this.btnReg.disabled = false;
-
-      this.ISBN.disabled = true;
-      this.ISBN.value = producto.ISBN;
-      this.nombre.value = producto.nombre;
-      this.precio.value = producto.precio.toString();
-      this.cantidad.value = producto.existencias.toString();
-      this.cantidad.min = producto.existencias.toString();
-      this.impuesto.value = producto.impuesto.toString();
-      this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
-      this.autoresSelected = [];
-      this.existencias = producto.existencias;
-      for (let i = 0; i < this.autor.options.length; i++) {
-        const element = this.autor.options[i];
-        element.selected = false;
-        for (let j = 0; j < this.autoresPreSelected.length; j++) {
-          const apl = this.autoresPreSelected[j];
-          if (apl.autorIdAutor == element.value) {
-            this.autoresSelected.push(element.value);
-            element.selected = true;
-          }
-        }
-      }
-      this.editorialesSelected = [];
-      for (let i = 0; i < this.editorial.options.length; i++) {
-        const element = this.editorial.options[i];
-        element.selected = false;
-        for (let j = 0; j < this.editorialesPreSelected.length; j++) {
-          const apl = this.editorialesPreSelected[j];
-          if (apl.editorialIdEditorial == element.value) {
-            this.editorialesSelected.push(element.value);
-            element.selected = true;
-          }
-        }
-      }
-    }
-  }
-
   initListeners() {
-    this.options.addEventListener('change', (event) => {
+    /*this.options.addEventListener('change', (event) => {
       if (this.options.value != "0") {
         let body = {
           ISBN: this.options.value
@@ -142,7 +108,7 @@ export class RegistrarComponent implements OnInit {
     this.autor.addEventListener('change', (event) => {
       this.autoresSelected = [];
       this.changeSelections(this.autor, this.autoresSelected);
-    });
+    });*/
   }
 
   changeSelections(selection: HTMLSelectElement, array: any[]) {
@@ -163,28 +129,28 @@ export class RegistrarComponent implements OnInit {
   }
 
   async consProductos() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consProds")
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProds")
     consulta.forEach((producto) => {
       this.productos = producto;
     });
   }
 
   async consAutores() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consAutores")
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consAutores")
     consulta.forEach((autores) => {
       this.autores = autores;
     });
   }
 
   async consEditoriales() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consEditoriales")
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consEditoriales")
     consulta.forEach((editoriales) => {
       this.editoriales = editoriales;
     });
   }
 
   registrarProducto() {
-    if (Number(this.cantidad.value) < this.existencias) {
+    /*if (Number(this.cantidad.value) < this.existencias) {
       Swal.fire('Cantidad', 'La cantidad ingresada es menor que las existencias actuales', 'error')
       return;
     }
@@ -224,7 +190,7 @@ export class RegistrarComponent implements OnInit {
         }
 
       });
-    }
+    }*/
 
   }
 

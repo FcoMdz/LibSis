@@ -189,10 +189,11 @@ router.post('/NC',
                                 return
                             }else{
                                 sql.commit()
-                                res.send({success:true, id: sqlRes1.insertId})
+                                
                             }
                         })
                     })
+                    res.send({success:true, id: sqlRes1.insertId})
                 }
             })
         }

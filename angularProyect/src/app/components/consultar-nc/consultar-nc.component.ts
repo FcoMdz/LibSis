@@ -27,6 +27,7 @@ export class ConsultarNcComponent implements OnInit{
     let retornar:infoNC[] = [];
     consulta.forEach((nc: any) => {
       this.Ncs = <infoNC[]>nc;
+      console.log(this.Ncs)
       this.initBusqueda();
     })
   }
@@ -39,7 +40,7 @@ export class ConsultarNcComponent implements OnInit{
       if(this.termino!=undefined && this.termino.value!=""){
         this.busqueda = this.termino.value;
         this.Ncs.forEach((nc:infoNC)=>{
-          if(nc.folioNC.toString().includes(this.busqueda)){
+          if(nc.FolioNC.toString().includes(this.busqueda)){
             this.NCsfiltradas.push(nc);
           }
         });
@@ -61,15 +62,17 @@ export class ConsultarNcComponent implements OnInit{
       let subtotal:number = 0;
       let impuestosTotal:number = 0;
       let total:number = 0;
+      console.log(details)
       details.forEach((detail:detNC)=>{
         subtotal += (detail.precioProducto*detail.cantidadProducto);
         impuestosTotal += (detail.impuesto*detail.cantidadProducto);
         detalles += `
               <tr>
+                <td>${detail.productoISBN}</td>
+                <td>${detail.nombre}</td>
                 <td>$${detail.precioProducto}</td>
                 <td> ${detail.cantidadProducto} </td>
                 <td>$${detail.impuesto}</td>
-                <td>  ${detail.productoISBN}</td>
               </tr>
         `
       });
@@ -78,17 +81,18 @@ export class ConsultarNcComponent implements OnInit{
       impuestosTotal = parseFloat(impuestosTotal.toFixed(2));
       subtotal = parseFloat(subtotal.toFixed(2));
       Swal.fire({
-        title: '<strong>Detalles de la venta: '+folio+'</strong>',
+        title: '<strong>Detalles de la compra: '+folio+'</strong>',
         icon: 'info',
         html:
         `
         <table class="table table-light table-striped text-center">
             <thead></thead>
               <tr>
+                <th>ISBN del producto</th>
+                <th>Producto</th>
                 <th>Precio del producto</th>
                 <th>Cantidad del producto</th>
                 <th>Impuesto</th>
-                <th>ISBN del producto</th>
               </tr>
             </thead>
             <tbody *ngFor="let detail of details">
@@ -116,12 +120,50 @@ export class ConsultarNcComponent implements OnInit{
       });
     });
     }
+
+    eliminarNC(elemento: infoNC){
+      Swal.fire({
+        title: '<strong>Eliminar nota de compra ' + elemento.FolioNC + '</strong>',
+        icon: 'question',
+        html: `¿De verdad se desea eliminar la nota de compra?`,
+        showCancelButton: true,
+        confirmButtonText: "Eliminar",
+        cancelButtonText:`Cancelar`
+      }).then((result) => {
+        if(result.isConfirmed){
+          let body = {
+            folioNC: elemento.FolioNC.toString()
+          }
+          this.sql.alta(this.sql.URL + '/baja/NC', body).then((sqlRes:any) => {
+            let resp = sqlRes
+            if(resp.success){
+              Swal.fire({
+                title: '<strong>Eliminar nota de compra ' + elemento.FolioNC + '</strong>',
+                icon: 'success',
+                html: `Se ha eliminado correctamente la nota de compra`,
+              })
+            }else{
+              let errores = ""
+              if(resp.err.code == "ER_CHECK_CONSTRAINT_VIOLATED"){
+                errores += "No se pudo eliminar, debido a que los productos ya han sido vendidos<br>"
+              }
+              Swal.fire({
+                title: '<strong>Eliminar nota de compra ' + elemento.FolioNC + '</strong>',
+                icon: 'error',
+                html: `Hubo un error al eliminar la nota de compra. ${errores}`,
+              })
+            }
+          })
+          
+        }
+      })
+    }
 }
 
 interface infoNC{
-  folioNC: number;
-  fechaCompra: Date;
-  proveedorId: number;
+  FolioNC: number;
+  Fecha: Date;
+  proveedorId_proveedor: number;
   nombre: string;
 }
 interface detNC{
@@ -130,4 +172,5 @@ interface detNC{
   precioProducto: number;
   impuesto: number;
   notaCompraFolioNC: number;
+  nombre: string;
 }

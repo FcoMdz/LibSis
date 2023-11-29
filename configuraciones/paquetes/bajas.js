@@ -29,7 +29,31 @@ router.post('/Prod',
         })
     })
 })
-
+router.post('/Prov',
+[
+    body('idProv').not().isEmpty().isInt()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success: false, err: errors})
+        return
+    }
+    let body = req.body
+    sql.query(`DELETE FROM proveedor WHERE id_proveedor=?`, 
+        [body.idProv], (sqlErr, sqrRes) => {
+        if(sqlErr){
+            res.send({
+                success: false,
+                err: sqlErr
+            })
+            return
+        }
+        res.send({
+            success: true
+        })
+    })
+})
 router.post('/NV',
 [
     body('folioNV').not().isEmpty().isString()

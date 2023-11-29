@@ -15,8 +15,10 @@ import { SQLService } from './services/sql.service';
 import { CrearNcComponent } from './components/crear-nc/crear-nc.component';
 import { CrearProvComponent } from './components/crear-prov/crear-prov.component';
 import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { CrearEdComponent } from './components/crear-ed/crear-ed.component';
 import { ConsultarNcComponent } from './components/consultar-nc/consultar-nc.component';
+import { CrearEmComponent } from './components/crear-em/crear-em.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +32,7 @@ import { ConsultarNcComponent } from './components/consultar-nc/consultar-nc.com
     CrearProvComponent,
     CrearEdComponent,
     ConsultarNcComponent,
+    CrearEmComponent,
 
   ],
   imports: [
@@ -39,7 +42,8 @@ import { ConsultarNcComponent } from './components/consultar-nc/consultar-nc.com
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-    DropdownModule
+    DropdownModule,
+    MultiSelectModule
   ],
   providers: [SQLService],
   bootstrap: [AppComponent]

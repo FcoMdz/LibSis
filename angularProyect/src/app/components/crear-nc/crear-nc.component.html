@@ -62,7 +62,7 @@
                   <div class="alert alert-danger mt-2"
                     [hidden]="formUser.get('precio')?.valid || formUser.get('precio')?.pristine">
                     <span *ngIf="formUser.get('precio')?.errors?.['pattern']">
-                      El precio puede variar desde $0.00 hasta $99999.99
+                      El precio puede variar desde $0.00 hasta $99999.99 (no olvide agregar los centavos)
                     </span>
                   </div>
                 </li>

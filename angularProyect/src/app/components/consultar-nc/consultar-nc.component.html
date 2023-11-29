@@ -21,14 +21,18 @@
               <th>Fecha</th>
               <th>Id Proveedor</th>
               <th>Nombre Proveedor</th>
+              <th>Borrar</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let nc of NCsfiltradas">
-              <td><button class="btn btn-outline-light" style="width: 100%;" (click)="mostrarDetalles(nc.folioNC)">{{nc.folioNC}}</button></td>
-              <td>{{nc.fechaCompra | date}}</td>
-              <td>{{nc.proveedorId}}</td>
+              <td><button class="btn btn-outline-light" style="width: 100%;" (click)="mostrarDetalles(nc.FolioNC)">{{nc.FolioNC}}</button></td>
+              <td>{{nc.Fecha | date}}</td>
+              <td>{{nc.proveedorId_proveedor}}</td>
               <td>{{nc.nombre}}</td>
+              <td>
+                <i class="fa-regular fa-trash-can" (click)="eliminarNC(nc)" style="cursor: pointer;"></i>
+              </td>
           </tr>
           </tbody>
         </table>

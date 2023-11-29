@@ -171,4 +171,41 @@ router.post('/ConsEditorial',
     })
 })
 
+router.get('/consNC',(req, res) => {
+    sql.query(`SELECT nc.*, p.nombre FROM notacompra nc, proveedor p WHERE nc.proveedorId_proveedor=p.id_proveedor ORDER BY nc.folioNC DESC`, (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+router.get('/consDetalleNC',(req, res) => {
+    sql.query(`SELECT dc.* FROM detallenc dc`, (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+router.post('/consDetalleNC', 
+[
+    body('idNC').not().isEmpty().isInt()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)})
+        return
+    }
+    let body = req.body
+    sql.query(`SELECT dc.*, p.nombre FROM detallenc dc, producto p WHERE dc.productoISBN = p.ISBN and notaCompraFolioNC=?`, [body.idNC], (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
 module.exports = router
