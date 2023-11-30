@@ -17,8 +17,10 @@
                   <p-dropdown
                     inputId="options"
                     (onChange)="changeListenerProd($event)"
+                    (onClear)="limpiarFormulario()"
                     styleClass="w-100"
                     [options] = "productos"
+                    formControlName="productos"
                     optionLabel="nombre"
                     [filter] = "true"
                     filterBy = "nombre"
@@ -60,7 +62,7 @@
                 <span style="width: 80%;">
                   <p-multiSelect
                     inputId="options"
-                    (onChange)="changeListenerEdit($event)"
+                    formControlName="editoriales"
                     styleClass="w-100"
                     [options] = "editoriales"
                     optionLabel="nombre"
@@ -94,8 +96,8 @@
                 <span style="width: 80%;">
                   <p-multiSelect
                     inputId="options"
-                    (onChange)="changeListenerAut($event)"
                     styleClass="w-100"
+                    formControlName="autores"
                     [options] = "autores"
                     optionLabel="nombre"
                     [filter] = "true"

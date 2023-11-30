@@ -8,7 +8,6 @@ router.post('/Prod',
     body('ISBN').not().isEmpty().isString(),
     body('nombre').not().isEmpty().isString(),
     body('precio').not().isEmpty().isFloat(),
-    body('existencias').not().isEmpty().isInt(),
     body('impuesto').not().isEmpty().isInt(),
     body('editoriales').not().isEmpty(),
     body('autores').not().isEmpty(),
@@ -20,7 +19,7 @@ router.post('/Prod',
         return
     }
     let body = req.body
-    sql.query(`INSERT INTO producto VALUES (?, ?, ?, ?, ?)`, [body.ISBN, body.nombre, body.precio, body.existencias, body.impuesto],(sqlErr, sqlRes) => {
+    sql.query(`INSERT INTO producto (ISBN, nombre, precio, impuesto, existencias) VALUES (?, ?, ?, ?, 0)`, [body.ISBN, body.nombre, body.precio, body.impuesto],(sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({
                     success:false, 
@@ -32,7 +31,7 @@ router.post('/Prod',
         let editoriales = body.editoriales
         let errores = []
         autres.forEach(autor => {
-            sql.query(`INSERT INTO productoautor VALUES (?, ?)`, [autor, body.ISBN],(sqlErr2, sqlRes2) => {
+            sql.query(`INSERT INTO productoautor VALUES (?, ?)`, [autor.id_autor, body.ISBN],(sqlErr2, sqlRes2) => {
                 if(sqlErr2){
                     errores += sqlErr2.message
                     return
@@ -40,7 +39,7 @@ router.post('/Prod',
             })
         })
         editoriales.forEach(editorial => {
-            sql.query(`INSERT INTO productoeditorial VALUES (?, ?)`, [editorial, body.ISBN],(sqlErr2, sqlRes2) => {
+            sql.query(`INSERT INTO productoeditorial VALUES (?, ?)`, [editorial.id_editorial, body.ISBN],(sqlErr2, sqlRes2) => {
                 if(sqlErr2){
                     errores += sqlErr2.message
                     return

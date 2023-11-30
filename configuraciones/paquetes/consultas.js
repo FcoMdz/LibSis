@@ -40,12 +40,12 @@ router.post('/consProd',
             res.send({success:false, err: sqlErr.message})
             return
         }
-        sql.query(`SELECT editorialIdEditorial, nombre FROM productoeditorial, editorial WHERE productoISBN=? and editorialIdEditorial = id_editorial`, [body.ISBN],(sqlErr1, sqlRes1) => {
+        sql.query(`SELECT editorialIdEditorial "id_editorial", nombre, telefono FROM productoeditorial, editorial WHERE productoISBN=? and editorialIdEditorial = id_editorial`, [body.ISBN],(sqlErr1, sqlRes1) => {
             if(sqlErr1){
                 res.send({success:false, err: sqlErr1.message})
                 return
             }
-            sql.query(`SELECT autorIdAutor, nombre FROM productoautor, autor WHERE productoISBN=? and autorIdAutor = id_autor`, [body.ISBN],(sqlErr2, sqlRes2) => {
+            sql.query(`SELECT autorIdAutor "id_autor", nombre FROM productoautor, autor WHERE productoISBN=? and autorIdAutor = id_autor`, [body.ISBN],(sqlErr2, sqlRes2) => {
                 if(sqlErr1){
                     res.send({success:false, err: sqlErr1.message})
                     return
