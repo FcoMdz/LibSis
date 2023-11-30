@@ -18,7 +18,7 @@
                       inputId="options"
                       (onChange)="changeListener($event)"
                       styleClass="w-100"
-                      [options] = "proveedores"
+                      [options] = "empleados"
                       optionLabel="nombre"
                       [filter] = "true"
                       filterBy = "nombre"
@@ -87,10 +87,10 @@
             </ul>
           </div>
           <div class="text-center my-2" id="btnDiv">
-            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProv()" id="btnReg"
+            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarEmpleado()" id="btnReg"
               [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar 
               <i class="fa-solid fa-book"></i></button>
-            <button type="submit" class="btn btn-lg btn-danger" (click)="eliminarProv()" id="btnElm"
+            <button type="submit" class="btn btn-lg btn-danger" (click)="eliminarEmpleado()" id="btnElm"
               [disabled]="true"><i class="fa-solid fa-circle-xmark"></i> Eliminar 
               <i class="fa-solid fa-circle-xmark"></i></button>
 

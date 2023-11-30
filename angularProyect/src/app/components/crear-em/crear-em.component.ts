@@ -19,7 +19,7 @@ export class CrearEmComponent implements OnInit{
     'nombre': new FormControl('', [Validators.required]),
     'contrasena': new FormControl('', [Validators.required]),
     'enccompras': new FormControl('',[Validators.required]),
-    'ventas': new FormControl('',[Validators.required]),
+    'vendedor': new FormControl('',[Validators.required]),
     'administrador': new FormControl('',[Validators.required])
   });
   ngOnInit(): Promise<void> {
@@ -52,13 +52,79 @@ export class CrearEmComponent implements OnInit{
       this.formUser.controls.nombre.setValue(empleado.nombre)
       this.formUser.controls.usuario.setValue(empleado.usuario)
       this.formUser.controls.contrasena.setValue(empleado.contrasena)
-      if(empleado.enccompras == 1){
-        this.formUser.controls.rol.setValue(empleado.enccompras)
-      }
-      
+      this.formUser.controls.enccompras.setValue(empleado.enccompras.toString())
       this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
       this.btnElm.disabled = false;
     }
+  }
+    changeListener(evento:DropdownChangeEvent) {
+      if (evento.value != null && evento.value.id_proveedor != "0") {
+        let body = {
+          idProv: evento.value.id_proveedor
+        }
+        this.sql.alta(this.sql.URL + "/consulta/ConsProv", body)
+          .then((datosProv) => {
+            if(datosProv!=undefined){
+              this.option = (<empleado[]>datosProv)[0]
+              this.loadEm(datosProv);
+            }
+          });
+      } else {
+        this.option = this.empleados[0]
+        this.limpiarFormulario();
+      }
+    }
+    
+  registrarEmpleado() {
+    let body = {
+      usuario: this.option.usuario,
+      nombre: this.formUser.controls.nombre.value,
+      contrasena: this.formUser.controls.contrasena,
+      vendedor: this.formUser.controls.vendedor,
+      enccompras: this.formUser.controls.enccompras,
+      administrador: this.formUser.controls.administrador
+    }
+    console.log(body)
+    if (this.option.usuario == " ") {
+      this.sql.alta(this.sql.URL + "/alta/Emp", body).then((res) => {
+        let respuesta = <res>res;
+        if (respuesta.success) {
+          Swal.fire('Registro', 'Se ha registrado correctamente el proveedor', 'success');
+          this.limpiarFormulario();
+          this.getData();
+        } else {
+          Swal.fire('Registro', 'Ha ocurrido un error al registrar el proveedor, faltan datos ' + respuesta.err, 'error');
+        }
+      })
+    } else {
+      this.sql.alta(this.sql.URL + "/cambio/Prov", body).then((res) => {
+        let respuesta = <res>res;
+        if (respuesta.success) {
+          Swal.fire('Actualizar', 'Se ha actualizado correctamente el proveedor', 'success');
+          this.limpiarFormulario();
+          this.getData();
+        } else {
+          Swal.fire('Actualizar', 'Ha ocurrido un error al actualizar el proveedor, faltan datos', 'error')
+        }
+
+      });
+    }
+  }
+  eliminarEmpleado(){
+    let body = {
+      usuario: this.option.usuario
+    }
+      this.sql.alta(this.sql.URL + "/baja/Emp",body).then((res) => {
+        let respuesta = <res>res;
+        if (respuesta.success) {
+          Swal.fire('Eliminado', 'Se ha eliminado correctamente el Empleado', 'success');
+          this.limpiarFormulario();
+          this.getData();
+        } else {
+          Swal.fire('Eliminado', 'Ha ocurrido un error al eliminar el Empleado' + respuesta.err, 'error');
+        }
+      })
+    
     }
 }
 
