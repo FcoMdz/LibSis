@@ -140,7 +140,6 @@
                 <span *ngIf="formUser.get('impuesto')?.errors?.['required']">
                   El impuesto es requerido.
                 </span>
-
                 <span *ngIf="formUser.get('impuesto')?.errors?.['pattern']">
                   El impuesto solo puede tener numeros.
                 </span>
@@ -149,10 +148,17 @@
             </li>
           </ul>
         </div>
-        <div class="text-center my-2">
-          <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"
+        <div class="row my-2">
+          <span class="col text-center">
+            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"
             [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar <i
               class="fa-solid fa-book"></i></button>
+          </span>
+          <span class="col text-center">
+            <button type="submit" class="btn btn-lg btn-danger" (click)="eliminarProducto()" id="btnElim"
+            [disabled]="formUser.invalid || formUser.controls.productos.value?.ISBN == '0'"><i class="fa-solid fa-trash-can"></i> Eliminar <i
+              class="fa-solid fa-trash-can"></i></button>
+          </span>
         </div>
       </form>
     </div>

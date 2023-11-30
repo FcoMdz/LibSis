@@ -3,6 +3,7 @@ import { SQLService, res } from 'src/app/services/sql.service';
 import { FormControl, Validators, FormGroup } from "@angular/forms";
 import Swal from 'sweetalert2';
 import { DropdownChangeEvent } from 'primeng/dropdown';
+import { body } from 'express-validator';
 
 @Component({
   selector: 'app-registrar',
@@ -56,6 +57,7 @@ export class RegistrarComponent implements OnInit {
     this.formUser.controls.impuesto.setValue(dataProd.producto.impuesto.toString())
     this.formUser.controls.autores.setValue(<autores[]>dataProd.autores)
     this.formUser.controls.editoriales.setValue(<editorial[]>dataProd.editoriales)
+    this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
   }
 
   async ngOnInit(): Promise<void> {
@@ -108,6 +110,35 @@ export class RegistrarComponent implements OnInit {
     consulta.forEach((editoriales) => {
       this.editoriales = <editorial[]>editoriales;
     });
+  }
+
+  eliminarProducto(){
+    Swal.fire({
+      title: 'Registro de productos',
+      text: '¿Esta seguro de querer eliminar las existencias de este producto?',
+      icon: 'question',
+      showConfirmButton: true,
+      confirmButtonText: 'Eliminar',
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar'
+    }).then((resultado) => {
+      if(resultado.isConfirmed){
+        let body = {
+          ISBN: this.optionProd?.producto.ISBN
+        }
+        this.sql.alta(this.sql.URL + "/baja/Prod", body).then((res) => {
+          let respuesta = <res>res;
+          if (respuesta.success) {
+            Swal.fire('Registro de productos', 'Se han eliminado las existencias correctamente el producto', 'success');
+            this.limpiarFormulario();
+            this.getData();
+          } else {
+            Swal.fire('Registro', 'Ha ocurrido un error al eliminar las existencias el producto', 'error');
+          }
+        })
+      }
+    })
+    return;
   }
 
   registrarProducto() {
