@@ -171,6 +171,36 @@ router.post('/ConsEditorial',
     })
 })
 
+router.get('/ConsAutores',(req, res) => {
+    sql.query(`SELECT * FROM auotr`, (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+
+router.post('/ConsAutor', 
+[
+    body('idAutor').not().isEmpty().isInt()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)})
+        return
+    }
+    let body = req.body
+    sql.query(`SELECT * FROM autor WHERE id_autor=?`, [body.idAutor], (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+
 router.get('/consNC',(req, res) => {
     sql.query(`SELECT nc.*, p.nombre FROM notacompra nc, proveedor p WHERE nc.proveedorId_proveedor=p.id_proveedor ORDER BY nc.folioNC DESC`, (sqlErr, sqlRes) => {
         if(sqlErr){

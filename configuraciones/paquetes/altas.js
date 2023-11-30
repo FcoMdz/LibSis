@@ -399,5 +399,32 @@ router.post("/Edit",
 }
 )
 
+router.post("/Autor",
+[
+    body('nombre').not().isEmpty().isString(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO autor (nombre) VALUES (?)`, [body.nombre],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
 module.exports = router
 

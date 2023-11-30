@@ -9,6 +9,8 @@ import { CrearNcComponent } from './components/crear-nc/crear-nc.component';
 import { CrearProvComponent } from './components/crear-prov/crear-prov.component';
 import { CrearEdComponent } from './components/crear-ed/crear-ed.component';
 import { ConsultarNcComponent } from './components/consultar-nc/consultar-nc.component';
+import { CrearAutorComponent } from './components/crear-autor/crear-autor.component';
+import { CrearEmComponent } from './components/crear-em/crear-em.component';
 
 const routes:Routes = [
   {path: 'RegProd', component: RegistrarComponent},
@@ -19,6 +21,8 @@ const routes:Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'RegEdit', component: CrearEdComponent},
   {path: 'ConsNC', component: ConsultarNcComponent},
+  {path: 'RegAut', component: CrearAutorComponent},
+  {path: 'RegEmp', component: CrearEmComponent},
   {path: '', component: InicioComponent},
   {path: '**', component: InicioComponent}
 ];

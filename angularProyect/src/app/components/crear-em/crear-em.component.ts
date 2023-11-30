@@ -53,6 +53,8 @@ export class CrearEmComponent implements OnInit{
       this.formUser.controls.usuario.setValue(empleado.usuario)
       this.formUser.controls.contrasena.setValue(empleado.contrasena)
       this.formUser.controls.enccompras.setValue(empleado.enccompras.toString())
+      this.formUser.controls.vendedor.setValue(empleado.vendedor.toString())
+      this.formUser.controls.administrador.setValue(empleado.administrador.toString())
       this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
       this.btnElm.disabled = false;
     }

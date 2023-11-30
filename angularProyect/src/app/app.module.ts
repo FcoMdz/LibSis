@@ -19,6 +19,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { CrearEdComponent } from './components/crear-ed/crear-ed.component';
 import { ConsultarNcComponent } from './components/consultar-nc/consultar-nc.component';
 import { CrearEmComponent } from './components/crear-em/crear-em.component';
+import { CrearAutorComponent } from './components/crear-autor/crear-autor.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { CrearEmComponent } from './components/crear-em/crear-em.component';
     CrearEdComponent,
     ConsultarNcComponent,
     CrearEmComponent,
+    CrearAutorComponent,
 
   ],
   imports: [
