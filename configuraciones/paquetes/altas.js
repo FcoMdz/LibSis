@@ -426,5 +426,38 @@ router.post("/Autor",
 }
 )
 
+router.post("/Emp",
+[
+    body('usuario').not().isEmpty().isString(),
+    body('nombre').not().isEmpty().isString(),
+    body('contrasena').not().isEmpty().isString(),
+    body('vendedor').not().isEmpty().isBoolean(),
+    body('enccompras').not().isEmpty().isBoolean(),
+    body('administrador').not().isEmpty().isBoolean(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO usuario (usuario,nombre,contrasena,vendedor,almacenista,cajero,enccompras,administrador) 
+                VALUES (?,?,?,?,0,0,?,?)`, [body.usuario,body.nombre,body.contrasena,body.vendedor,body.enccompras,body.administrador],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
 module.exports = router
 

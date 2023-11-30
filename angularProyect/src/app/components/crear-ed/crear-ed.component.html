@@ -1,4 +1,4 @@
-<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.admin); else iniciarSesion">
+<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion">
     <div class="row text-center">
       <div class="col-12">
         <h2>REGISTRO DE EDITORIALES</h2>
@@ -34,14 +34,14 @@
                   <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre de la editorial"
                     aria-label="Nombre editorial" aria-describedby="basic-addon1" id="nombre" required />
                 </div>
-  
+
                 <div class="alert alert-danger mt-2"
                   [hidden]="formUser.get('nombre')?.valid || formUser.get('nombre')?.pristine">
                   <span *ngIf="formUser.get('nombre')?.errors?.['required']">
                     El nombre es requerido.
                   </span>
                 </div>
-  
+
               </li>
               <li class="list-group-item">
                 <div class="input-group">
@@ -49,7 +49,7 @@
                   <input type="text" class="form-control" formControlName="telefono" placeholder="XXX - XXX - XXXX"
                     aria-label="Nombre producto" aria-describedby="basic-addon1" id="telefono" required />
                 </div>
-  
+
                 <div class="alert alert-danger mt-2"
                   [hidden]="formUser.get('telefono')?.valid || formUser.get('telefono')?.pristine">
                   <span *ngIf="formUser.get('telefono')?.errors?.['required']">
@@ -62,20 +62,20 @@
                     El telefono debe ser de 10 digitos
                   </span>
                 </div>
-  
+
               </li>
             </ul>
           </div>
           <div class="text-center my-2">
             <button type="submit" class="btn btn-lg btn-primary" (click)="registrarEd()" id="btnReg"
-              [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar 
+              [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar
               <i class="fa-solid fa-book"></i></button>
           </div>
         </form>
       </div>
     </div>
   </div>
-  
+
   <ng-template #iniciarSesion>
     <div class="container my-4 text-center">
       <h1>Inicie sesión para acceder a esta página</h1>

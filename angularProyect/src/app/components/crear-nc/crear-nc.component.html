@@ -1,4 +1,4 @@
-<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.admin); else iniciarSesion">
+<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion">
     <div class="row text-center">
       <div class="col-12">
         <h2>REGISTRAR NOTA DE COPMPRA</h2>
@@ -49,10 +49,10 @@
                         placeholder="Seleccione un producto"
                       ></p-dropdown>
                     </span>
-                    
+
                   </div>
                 </li>
-  
+
                 <li class="list-group-item">
                   <div class="input-group">
                     <label class="input-group-text" for="precio" id="basic-addon1">Precio $</label>
@@ -94,7 +94,7 @@
                   </div>
                 </li>
               </ul>
-              
+
             </div>
             <div class="card-footer text-center">
               <div class="row">
@@ -164,7 +164,7 @@
       </div>
     </div>
   </div>
-  
+
   <ng-template #iniciarSesion>
     <div class="container my-4 text-center">
       <h1>Inicie sesión para acceder a esta página</h1>

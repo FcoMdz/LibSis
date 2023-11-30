@@ -1,4 +1,4 @@
-<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.admin); else iniciarSesion">
+<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion">
     <div class="row text-center">
       <div class="col-12">
         <h2>REGISTRO DE AUTORES</h2>
@@ -26,7 +26,7 @@
                       placeholder="Seleccione un autor"
                     ></p-dropdown>
                   </span>
-                  
+
                 </div>
               </li>
 
@@ -36,27 +36,27 @@
                   <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre del autor"
                     aria-label="Nombre producto" aria-describedby="basic-addon1" id="nombre" required />
                 </div>
-  
+
                 <div class="alert alert-danger mt-2"
                   [hidden]="formUser.get('nombre')?.valid || formUser.get('nombre')?.pristine">
                   <span *ngIf="formUser.get('nombre')?.errors?.['required']">
                     El nombre es requerido.
                   </span>
                 </div>
-  
+
               </li>
             </ul>
           </div>
           <div class="text-center my-2" id="btnDiv">
             <button type="submit" class="btn btn-lg btn-primary" (click)="registrarAutor()" id="btnReg"
-              [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar 
+              [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar
               <i class="fa-solid fa-book"></i></button>
           </div>
         </form>
       </div>
     </div>
   </div>
-  
+
   <ng-template #iniciarSesion>
     <div class="container my-4 text-center">
       <h1>Inicie sesión para acceder a esta página</h1>

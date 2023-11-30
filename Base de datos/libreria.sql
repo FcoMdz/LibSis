@@ -397,7 +397,7 @@ ALTER TABLE `proveedor`
 --
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`usuario`),
-  ADD UNIQUE KEY `contrasena` (`contrasena`);
+  ADD UNIQUE KEY `usuario` (`usuario`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
