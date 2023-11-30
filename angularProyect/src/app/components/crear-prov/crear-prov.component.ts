@@ -12,7 +12,6 @@ import Swal from 'sweetalert2';
 export class CrearProvComponent implements OnInit {
   usuario: any = sessionStorage.getItem('usuario');
   btnReg!: HTMLButtonElement;
-  btnElm!: HTMLButtonElement;
   proveedores!:any;
   option!:proveedor
 
@@ -29,7 +28,6 @@ export class CrearProvComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.getData();
     this.btnReg = <HTMLButtonElement>document.getElementById("btnReg")!;
-    this.btnElm = <HTMLButtonElement>document.getElementById("btnElm")!;
   }
 
   async getData() {
@@ -40,7 +38,6 @@ export class CrearProvComponent implements OnInit {
     this.formUser.reset()
     this.btnReg.innerHTML = '<i class="fa-solid fa-book"></i> Registrar <i class="fa-solid fa-book"></i>';
     this.btnReg.disabled = true;
-    this.btnElm.disabled = true;
   }
 
   loadProv(datosProv: any) {
@@ -52,8 +49,6 @@ export class CrearProvComponent implements OnInit {
       this.formUser.controls.telefono.setValue(prov.telefono)
       this.formUser.controls.rfc.setValue(prov.RFC)
       this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
-      this.btnElm.disabled = false;
-      
     }
   }
 
@@ -146,7 +141,7 @@ export class CrearProvComponent implements OnInit {
           Swal.fire('Eliminado', 'Ha ocurrido un error al eliminar el proveedor' + respuesta.err, 'error');
         }
       })
-    
+
     }
   }
 
