@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SQLService, res } from 'src/app/services/sql.service';
-import { FormControl, Validators, FormGroup } from "@angular/forms";
+import { FormControl, Validators, FormGroup } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { DropdownChangeEvent } from 'primeng/dropdown';
 import { body } from 'express-validator';
@@ -8,7 +8,7 @@ import { body } from 'express-validator';
 @Component({
   selector: 'app-registrar',
   templateUrl: './registrar.component.html',
-  styleUrls: ['./registrar.component.css']
+  styleUrls: ['./registrar.component.css'],
 })
 export class RegistrarComponent implements OnInit {
   usuario: any = sessionStorage.getItem('usuario');
@@ -164,24 +164,39 @@ export class RegistrarComponent implements OnInit {
       this.sql.alta(this.sql.URL + "/alta/Prod", body).then((res) => {
         let respuesta = <res>res;
         if (respuesta.success) {
-          Swal.fire('Registro', 'Se ha registrado correctamente el producto', 'success');
+          Swal.fire(
+            'Registro',
+            'Se ha registrado correctamente el producto',
+            'success'
+          );
           this.limpiarFormulario();
           this.getData();
         } else {
-          Swal.fire('Registro', 'Ha ocurrido un error al registrar el producto, faltan datos ', 'error');
+          Swal.fire(
+            'Registro',
+            'Ha ocurrido un error al registrar el producto, faltan datos ',
+            'error'
+          );
         }
-      })
+      });
     } else {
       this.sql.alta(this.sql.URL + "/cambio/Prod", body).then((res) => {
         let respuesta = <res>res;
         if (respuesta.success) {
-          Swal.fire('Actualizar', 'Se ha actualizado correctamente el producto', 'success');
+          Swal.fire(
+            'Actualizar',
+            'Se ha actualizado correctamente el producto',
+            'success'
+          );
           this.limpiarFormulario();
           this.getData();
         } else {
-          Swal.fire('Actualizar', 'Ha ocurrido un error al actualizar el producto, faltan datos', 'error')
+          Swal.fire(
+            'Actualizar',
+            'Ha ocurrido un error al actualizar el producto, faltan datos',
+            'error'
+          );
         }
-
       });
     }
   }

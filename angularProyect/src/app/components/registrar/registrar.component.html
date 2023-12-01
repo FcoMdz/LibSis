@@ -1,4 +1,7 @@
-<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion">
+<div
+  class="container"
+  *ngIf="usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion"
+>
   <div class="row text-center">
     <div class="col-12">
       <h2>REGISTRO DE PRODUCTOS</h2>
@@ -6,7 +9,7 @@
   </div>
   <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-8 col-xxl-6">
-      <form [formGroup]="formUser">
+      <form [formGroup]="formGroup">
         <div class="card">
           <div class="card-header">Ingrese los siguientes datos</div>
           <ul class="list-group list-group-flush">
@@ -32,15 +35,30 @@
             </li>
             <li class="list-group-item">
               <div class="input-group">
-                <label for="isbn" class="input-group-text" id="basic-addon1">ISBN</label>
-                <input type="text" class="form-control" formControlName="isbn" placeholder="xxx-x-xx-xxxxxx-x"
-                  aria-label="Username" aria-describedby="basic-addon1" id="isbn" required />
+                <label for="isbn" class="input-group-text" id="basic-addon1"
+                  >ISBN</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="isbn"
+                  placeholder="xxx-x-xx-xxxxxx-x"
+                  aria-label="Username"
+                  aria-describedby="basic-addon1"
+                  id="isbn"
+                  required
+                />
               </div>
 
-              <div class="alert alert-danger mt-2"
-                [hidden]="formUser.get('isbn')?.valid || formUser.get('isbn')?.pristine">
-                <span *ngIf="formUser.get('isbn')?.errors?.['required']">
-                  El ISBN es requerido. <br>
+              <div
+                class="alert alert-danger mt-2"
+                [hidden]="
+                  formGroup.get('isbn')?.valid ||
+                  formGroup.get('isbn')?.pristine
+                "
+              >
+                <span *ngIf="formGroup.get('isbn')?.errors?.['required']">
+                  El ISBN es requerido. <br />
                 </span>
                 <span *ngIf="formUser.get('isbn')?.errors?.['minlength']">
                   El ISBN debe de ser de 13 numeros <br>
@@ -50,11 +68,10 @@
                   El ISBN debe de ser de 13 numeros <br>
                 </span>
 
-                <span *ngIf="formUser.get('isbn')?.errors?.['pattern']">
+                <span *ngIf="formGroup.get('isbn')?.errors?.['pattern']">
                   EL ISBN solo puede tener numeros.
                 </span>
               </div>
-
             </li>
             <li class="list-group-item">
               <div class="input-group">
@@ -73,22 +90,35 @@
                   ></p-multiSelect>
                 </span>
               </div>
-
             </li>
             <li class="list-group-item">
               <div class="input-group">
-                <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
-                <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre producto"
-                  aria-label="Nombre producto" aria-describedby="basic-addon1" id="nombre" required />
+                <label class="input-group-text" for="nombre" id="basic-addon1"
+                  >Nombre</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="nombre"
+                  placeholder="Nombre producto"
+                  aria-label="Nombre producto"
+                  aria-describedby="basic-addon1"
+                  id="nombre"
+                  required
+                />
               </div>
 
-              <div class="alert alert-danger mt-2"
-                [hidden]="formUser.get('nombre')?.valid || formUser.get('nombre')?.pristine">
-                <span *ngIf="formUser.get('nombre')?.errors?.['required']">
+              <div
+                class="alert alert-danger mt-2"
+                [hidden]="
+                  formGroup.get('nombre')?.valid ||
+                  formGroup.get('nombre')?.pristine
+                "
+              >
+                <span *ngIf="formGroup.get('nombre')?.errors?.['required']">
                   El nombre es requerido.
                 </span>
               </div>
-
             </li>
             <li class="list-group-item">
               <div class="input-group">
@@ -107,22 +137,36 @@
                   ></p-multiSelect>
                 </span>
               </div>
-
             </li>
             <li class="list-group-item">
               <div class="input-group">
-                <label for="precio" class="input-group-text" id="basic-addon1">Precio</label>
-                <input type="text" class="form-control" formControlName="precio" placeholder="$000.00"
-                  aria-label="Username" aria-describedby="basic-addon1" id="precio" required />
+                <label for="precio" class="input-group-text" id="basic-addon1"
+                  >Precio</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="precio"
+                  placeholder="$000.00"
+                  aria-label="Username"
+                  aria-describedby="basic-addon1"
+                  id="precio"
+                  required
+                />
               </div>
 
-              <div class="alert alert-danger mt-2"
-                [hidden]="formUser.get('precio')?.valid || formUser.get('precio')?.pristine">
-                <span *ngIf="formUser.get('precio')?.errors?.['required']">
+              <div
+                class="alert alert-danger mt-2"
+                [hidden]="
+                  formGroup.get('precio')?.valid ||
+                  formGroup.get('precio')?.pristine
+                "
+              >
+                <span *ngIf="formGroup.get('precio')?.errors?.['required']">
                   El precio es requerido.
                 </span>
 
-                <span *ngIf="formUser.get('precio')?.errors?.['pattern']">
+                <span *ngIf="formGroup.get('precio')?.errors?.['pattern']">
                   El precio solo puede tener numeros.
                 </span>
               </div>
@@ -130,35 +174,43 @@
             </li>
             <li class="list-group-item">
               <div class="input-group">
-                <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto</label>
-                <input type="text" class="form-control" formControlName="impuesto" placeholder="Ej. 5"
-                  aria-label="Username" aria-describedby="basic-addon1" id="impuesto" required />
+                <label for="impuesto" class="input-group-text" id="basic-addon1"
+                  >Impuesto</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="impuesto"
+                  placeholder="Ej. 5"
+                  aria-label="Username"
+                  aria-describedby="basic-addon1"
+                  id="impuesto"
+                  required
+                />
               </div>
 
-              <div class="alert alert-danger mt-2"
-                [hidden]="formUser.get('impuesto')?.valid || formUser.get('impuesto')?.pristine">
-                <span *ngIf="formUser.get('impuesto')?.errors?.['required']">
+              <div
+                class="alert alert-danger mt-2"
+                [hidden]="
+                  formGroup.get('impuesto')?.valid ||
+                  formGroup.get('impuesto')?.pristine
+                "
+              >
+                <span *ngIf="formGroup.get('impuesto')?.errors?.['required']">
                   El impuesto es requerido.
                 </span>
+
                 <span *ngIf="formUser.get('impuesto')?.errors?.['pattern']">
                   El impuesto solo puede tener numeros.
                 </span>
               </div>
-
             </li>
           </ul>
         </div>
-        <div class="row my-2">
-          <span class="col text-center">
-            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"
+        <div class="text-center my-2">
+          <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"
             [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar <i
               class="fa-solid fa-book"></i></button>
-          </span>
-          <span class="col text-center">
-            <button type="submit" class="btn btn-lg btn-danger" (click)="eliminarProducto()" id="btnElim"
-            [disabled]="formUser.invalid || formUser.controls.productos.value?.ISBN == '0'"><i class="fa-solid fa-trash-can"></i> Eliminar <i
-              class="fa-solid fa-trash-can"></i></button>
-          </span>
         </div>
       </form>
     </div>
