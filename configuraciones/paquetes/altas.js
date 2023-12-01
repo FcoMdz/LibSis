@@ -258,11 +258,11 @@ router.post('/Enc',
                                 })
                                 return
                             }
-                            res.send({success:true, id: sqlRes1.insertId})
-                            sql.commit()
+                            
                         })
                     })
-                    
+                    res.send({success:true, id: sqlRes1.insertId})
+                    sql.commit()
                 })
             }
         })
@@ -274,7 +274,8 @@ router.post('/NA',
     body('idCte').not().isEmpty().isInt(),
     body('ISBNProds').not().isEmpty(),
     body('estatus').not().isEmpty(),
-    body('abono').not().isEmpty()
+    body('abono').not().isEmpty(),
+    body('fecha').not().isEmpty()
 ],
 (req, res) => {
     const errors = validationResult(req)
@@ -308,7 +309,7 @@ router.post('/NA',
                         productos.push(data)
                     }
                 })
-                var d = new Date()
+                var d = body.fecha
                 d.setTime(d.getTime() - (/* UTC-6 */ 6) * 60 * 60 * 1000)
                 fecha = d.toISOString().split("T")[0]
                 sql.query(`INSERT INTO notaapartado (abono, fecha, clienteId_cte, estatus) VALUES (?, ?, ?, ?)`, [body.abono, fecha, body.idCte, body.estatus], (sqlErr1, sqlRes1) => {
@@ -331,10 +332,10 @@ router.post('/NA',
                                 })
                                 return
                             }
-                            res.send({success:true, id: sqlRes1.insertId})
-                            sql.commit()
                         })
                     })
+                    sql.commit()
+                    res.send({success:true, id: sqlRes1.insertId})
                 })
             }
         })
@@ -453,7 +454,36 @@ router.post("/Emp",
             return
         }
         res.send({
-            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
+
+router.post("/Cte",
+[
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO cliente (nombre, telefono) 
+                VALUES (?,?)`, [body.nombre,body.telefono],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message,
+                    code: sqlErr.code
+                })
+            return
+        }
+        res.send({
             success:true
         })
     })

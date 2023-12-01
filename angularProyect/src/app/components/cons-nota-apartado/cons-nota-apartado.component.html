@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row">
     <div class="col-12">
-      <h2>CONSULTA DE LA NOTA DE VENTA</h2>
+      <h2>CONSULTA DE LA NOTA DE APARTADO</h2>
       <p>Ingrese el folio que quiere consultar</p>
     </div>
   </div>
@@ -33,14 +33,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="">
+        <tr *ngFor="let notaapartado of mostrarNotas">
           <td>
-            <button class="btn btn-outline-light" style="width: 100%"></button>
+            <button class="btn btn-outline-light" style="width: 100%">{{notaapartado.FolioNA}}</button>
           </td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td>{{notaapartado.Abono}}</td>
+          <td>{{notaapartado.clienteId_cte}}</td>
+          <td>{{notaapartado.nombre}}</td>
+          <td>{{notaapartado.Fecha | date}}</td>
         </tr>
       </tbody>
     </table>

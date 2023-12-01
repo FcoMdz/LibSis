@@ -412,4 +412,33 @@ router.post("/Autor",
 }
 )
 
+
+router.post("/Cte",
+[
+    body('idCte').not().isEmpty().isInt(),
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE cliente SET nombre=?, telefono=? WHERE id_cte=?`, [body.nombre,body.telefono,body.idCte],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
+
 module.exports = router

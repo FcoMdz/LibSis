@@ -101,8 +101,37 @@ router.get('/consCte', (req, res) => {
     })
 })
 
+router.post('/consCte', [
+    body('idCte').not().isEmpty().isInt()
+], 
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)})
+        return
+    }
+    let body = req.body
+    sql.query(`SELECT * FROM cliente WHERE id_cte=?`, [body.idCte], (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+
 router.get('/ConsNV', (req, res) => {
     sql.query(`SELECT nv.*, cte.nombre FROM notaventa nv, cliente cte WHERE cte.id_cte=nv.clienteId_cte`, (sqlErr, sqlRes) => {
+        if(sqlErr){
+            res.send({success:false, err: sqlErr.message})
+            return
+        }
+        res.send(sqlRes)
+    })
+})
+
+router.get('/ConsNA', (req, res) => {
+    sql.query(`SELECT na.*, cte.nombre FROM notaapartado na, cliente cte WHERE cte.id_cte=na.clienteId_cte`, (sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({success:false, err: sqlErr.message})
             return
@@ -150,6 +179,7 @@ router.get('/ConsEditoriales',(req, res) => {
         res.send(sqlRes)
     })
 })
+
 
 router.post('/ConsEditorial', 
 [

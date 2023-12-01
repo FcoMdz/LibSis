@@ -222,6 +222,7 @@ interface ventaCte {
   Id_cte: string;
   nombre_cte: string;
 }
+
 class venderProducto {
   ISBN: string = '';
   nombre: string = '';

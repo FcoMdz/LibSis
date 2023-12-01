@@ -15,6 +15,17 @@
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <div class="input-group">
+              <label class="input-group-text" for="options">Cliente</label>
+              <span style="width: 87%;">
+                <p-dropdown inputId="options" (onChange)="changeListener($event)" styleClass="w-100"
+                  [options]="clientes" optionLabel="Nombre" [filter]="true" filterBy="nombre" [showClear]="true"
+                  placeholder="Seleccione un cliente"></p-dropdown>
+              </span>
+
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="input-group">
               <label class="input-group-text" for="nombre">Nombre</label>
               <input type="text" class="form-control" id="nombre" formControlName="nombre" />
             </div>
@@ -47,7 +58,7 @@
                 El telefono solo puede tener numeros.
               </span>
 
-              <span *ngIf="formGroup.get('telefono')?.errors?.['maxLength']">
+              <span *ngIf="formGroup.get('telefono')?.errors?.['maxlength']">
                 El telefono no es valido.
               </span>
             </div>
@@ -55,7 +66,7 @@
         </ul>
       </div>
       <div class="text-center my-2">
-        <button type="submit" class="btn btn-lg btn-primary" id="btnReg" [disabled]="formGroup.invalid">
+        <button type="submit" (click)="subirCliente()" class="btn btn-lg btn-primary" id="btnReg" [disabled]="formGroup.invalid">
           <i class="fa-solid fa-book"></i> Registrar
           <i class="fa-solid fa-book"></i>
         </button>
