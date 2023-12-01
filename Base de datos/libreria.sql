@@ -526,6 +526,91 @@ ALTER TABLE `productoeditorial`
   ADD CONSTRAINT `productoeditorial_ibfk_1` FOREIGN KEY (`productoISBN`) REFERENCES `producto` (`ISBN`) ON UPDATE CASCADE,
   ADD CONSTRAINT `productoeditorial_ibfk_2` FOREIGN KEY (`editorialIdEditorial`) REFERENCES `editorial` (`id_editorial`) ON UPDATE CASCADE;
 COMMIT;
+--Vistas
+--
+--Vista 1:  muestra detalles de las compras realizadas por cada cliente,
+-- incluyendo información sobre los productos comprados, las fechas de compra y los montos totales.
+CREATE VIEW DetallesComprasPorCliente AS
+SELECT
+  nc.FolioNC,
+  nc.Fecha,
+  c.Nombre AS Cliente,
+  p.nombre AS Producto,
+  dnc.precioProducto,
+  dnc.cantidadProducto,
+  dnc.impuesto,
+  (dnc.precioProducto * dnc.cantidadProducto) AS MontoTotal
+FROM
+  notacompra nc
+  JOIN proveedor pr ON nc.proveedorId_proveedor = pr.id_proveedor
+  JOIN detallenc dnc ON nc.FolioNC = dnc.notaCompraFolioNC
+  JOIN producto p ON dnc.productoISBN = p.ISBN
+  JOIN cliente c ON pr.nombre = c.Nombre;
+
+--Vista 2: Muestra un resumen de los encargos realizados agrupados por autor, 
+--incluyendo detalles sobre los productos encargados y los abonos realizados.
+CREATE VIEW ResumenEncargosPorAutor AS
+SELECT
+  a.nombre AS Autor,
+  p.nombre AS Producto,
+  e.FolioEncargo,
+  e.Abono,
+  de.precioProducto,
+  de.cantidadProducto,
+  de.impuestoProducto
+FROM
+  encargo e
+  JOIN cliente c ON e.clienteId_cte = c.id_cte
+  JOIN detalleencargo de ON e.FolioEncargo = de.encargoFolioEncargo
+  JOIN producto p ON de.productoISBN = p.ISBN
+  JOIN productoautor pa ON p.ISBN = pa.productoISBN
+  JOIN autor a ON pa.autorIdAutor = a.id_autor;
+
+--vista 3: Proporciona un informe de las ventas realizadas por cada editorial,
+-- mostrando detalles sobre los productos vendidos, las fechas de venta y los montos totales.
+CREATE VIEW VentasPorEditorial AS
+SELECT
+  nv.folioNV,
+  nv.fechaVenta,
+  e.nombre AS Editorial,
+  p.nombre AS Producto,
+  dnv.precioProducto,
+  dnv.cantidadProdcuto, 
+  dnv.impuesto,
+  (dnv.precioProducto * dnv.cantidadProdcuto) AS MontoTotal
+FROM
+  notaventa nv
+  JOIN cliente c ON nv.clienteId_cte = c.id_cte
+  JOIN detallenv dnv ON nv.folioNV = dnv.notaVentaFolioNV
+  JOIN producto p ON dnv.productoISBN = p.ISBN
+  JOIN productoeditorial pe ON p.ISBN = pe.productoISBN
+  JOIN editorial e ON pe.editorialIdEditorial = e.id_editorial;
+
+  -- Uso de intersec en 1 consulta
+-- Obtener clientes comunes en compras y encargos
+SELECT clienteId_cte AS ClienteID, Nombre AS ClienteNombre FROM encargo
+INTERSECT
+SELECT clienteId_cte, Nombre FROM notaventa;
+
+--Uso de Rollup
+--Si se requiere estructurar la consulta para obtener totales 
+--para todas las combinaciones de autor, editorial y cliente
+SELECT
+  autor.nombre AS Autor,
+  editorial.nombre AS Editorial,
+  cliente.Nombre AS Cliente,
+  SUM(dnv.precioProducto * dnv.cantidadProdcuto) AS MontoTotal
+FROM
+  notaventa nv
+  LEFT JOIN cliente ON nv.clienteId_cte = cliente.id_cte
+  LEFT JOIN detallenv dnv ON nv.folioNV = dnv.notaVentaFolioNV
+  LEFT JOIN producto p ON dnv.productoISBN = p.ISBN
+  LEFT JOIN productoautor pa ON p.ISBN = pa.productoISBN
+  LEFT JOIN autor ON pa.autorIdAutor = autor.id_autor
+  LEFT JOIN productoeditorial pe ON p.ISBN = pe.productoISBN
+  LEFT JOIN editorial ON pe.editorialIdEditorial = editorial.id_editorial
+GROUP BY autor.nombre, editorial.nombre, cliente.Nombre WITH ROLLUP;
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
@@ -984,4 +1069,5 @@ BEGIN
     FROM dual;
 END //
 
-DELIMITER ;
+DELIMITER;
+    
