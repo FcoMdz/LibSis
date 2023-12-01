@@ -1,172 +1,154 @@
 <div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion">
-    <div class="row text-center">
-      <div class="col-12">
-        <h2>REGISTRAR NOTA DE COPMPRA</h2>
+  <div class="row text-center">
+    <div class="col-12">
+      <h2>REGISTRAR NOTA DE COPMPRA</h2>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8 col-xxl-6 mb-3 mb-lg-0">
+      <div class="card">
+        <div class="card-header">
+          Ingrese los siguientes datos
+        </div>
+
+        <form action="" [formGroup]="formUser">
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="optionsProv">Proveedor</label>
+                  <span style="width: 82.9%;">
+                    <p-dropdown inputId="optionsProv" (onChange)="changeListenerProv($event)" styleClass="w-100"
+                      [disabled]="deshabilitarPrv()" [options]="proveedores" optionLabel="nombre" [filter]="true"
+                      filterBy="nombre" [showClear]="true" placeholder="Seleccione un proveedor"></p-dropdown>
+                  </span>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="optionsProd">Producto</label>
+                  <span style="width: 84.3%;">
+                    <p-dropdown inputId="optionsProd" (onChange)="changeListenerProd($event)" styleClass="w-100"
+                      [options]="productos" optionLabel="nombre" [filter]="true" filterBy="nombre" [showClear]="true"
+                      placeholder="Seleccione un producto"></p-dropdown>
+                  </span>
+
+                </div>
+              </li>
+
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="precio" id="basic-addon1">Precio $</label>
+                  <input id="precio" type="text" class="form-control" placeholder="000.00" aria-label="Username"
+                    aria-describedby="basic-addon1" formControlName="precio" />
+                </div>
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('precio')?.valid || formUser.get('precio')?.pristine">
+                  <span *ngIf="formUser.get('precio')?.errors?.['pattern']">
+                    El precio puede variar desde $0.00 hasta $99999.99 (no olvide agregar los centavos)
+                  </span>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto %</label>
+                  <input id="impuesto" type="text" class="form-control" placeholder="00" aria-label="Username"
+                    aria-describedby="basic-addon1" formControlName="impuesto" />
+                </div>
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('impuesto')?.valid || formUser.get('impuesto')?.pristine">
+                  <span *ngIf="formUser.get('impuesto')?.errors?.['pattern']">
+                    El impuesto es un porcentaje que va del 0% al 99%
+                  </span>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label for="cant" class="input-group-text" id="basic-addon1">Cantidad</label>
+                  <input id="cant" type="text" min="1" class="form-control" formControlName="cantidad"
+                    placeholder="Ej. 1" aria-label="Cantidad" aria-describedby="basic-addon1" />
+                </div>
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('cantidad')?.valid || formUser.get('cantidad')?.pristine">
+                  <span *ngIf="formUser.get('cantidad')?.errors?.['pattern']">
+                    La cantidad solo puede contener numeros enteros.
+                  </span>
+                </div>
+              </li>
+            </ul>
+
+          </div>
+          <div class="card-footer text-center">
+            <div class="row">
+              <div class="col-6"><button class="btn btn-outline-primary" style="width: 100%;"
+                  (click)="agregarProducto()" [disabled]="formUser.invalid"><i class="fa-solid fa-circle-plus"></i>
+                  Agregar <i class="fa-solid fa-circle-plus"></i></button></div>
+              <div class="col-6"><button class="btn btn-outline-success" style="width: 100%;" (click)="cargarNC()"
+                  [disabled]="formUser.invalid"><i class="fa-solid fa-receipt"></i> Registrar <i
+                    class="fa-solid fa-receipt"></i></button></div>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-    <div class="row justify-content-center">
-      <div class="col-lg-10 col-xl-8 col-xxl-6 mb-3 mb-lg-0">
-        <div class="card">
-          <div class="card-header">
-            Ingrese los siguientes datos
-          </div>
-
-          <form action="" [formGroup]="formUser">
-            <div class="card-body">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                  <div class="input-group">
-                    <label class="input-group-text" for="optionsProv">Proveedor</label>
-                    <span style="width: 78%;">
-                      <p-dropdown
-                        inputId="optionsProv"
-                        (onChange)="changeListenerProv($event)"
-                        styleClass="w-100"
-                        [disabled] = "deshabilitarPrv()"
-                        [options] = "proveedores"
-                        optionLabel="nombre"
-                        [filter] = "true"
-                        filterBy = "nombre"
-                        [showClear]="true"
-                        placeholder="Seleccione un proveedor"
-                      ></p-dropdown>
-                    </span>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="input-group">
-                    <label class="input-group-text" for="optionsProd">Producto</label>
-                    <span style="width: 80%;">
-                      <p-dropdown
-                        inputId="optionsProd"
-                        (onChange)="changeListenerProd($event)"
-                        styleClass="w-100"
-                        [options] = "productos"
-                        optionLabel="nombre"
-                        [filter] = "true"
-                        filterBy = "nombre"
-                        [showClear]="true"
-                        placeholder="Seleccione un producto"
-                      ></p-dropdown>
-                    </span>
-
-                  </div>
-                </li>
-
-                <li class="list-group-item">
-                  <div class="input-group">
-                    <label class="input-group-text" for="precio" id="basic-addon1">Precio $</label>
-                    <input id="precio" type="text" class="form-control" placeholder="000.00" aria-label="Username"
-                      aria-describedby="basic-addon1" formControlName="precio"/>
-                  </div>
-                  <div class="alert alert-danger mt-2"
-                    [hidden]="formUser.get('precio')?.valid || formUser.get('precio')?.pristine">
-                    <span *ngIf="formUser.get('precio')?.errors?.['pattern']">
-                      El precio puede variar desde $0.00 hasta $99999.99 (no olvide agregar los centavos)
-                    </span>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="input-group">
-                    <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto %</label>
-                    <input id="impuesto" type="text" class="form-control" placeholder="00" aria-label="Username"
-                      aria-describedby="basic-addon1" formControlName="impuesto" />
-                  </div>
-                  <div class="alert alert-danger mt-2"
-                    [hidden]="formUser.get('impuesto')?.valid || formUser.get('impuesto')?.pristine">
-                    <span *ngIf="formUser.get('impuesto')?.errors?.['pattern']">
-                      El impuesto es un porcentaje que va del 0% al 99%
-                    </span>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="input-group">
-                    <label for="cant" class="input-group-text" id="basic-addon1">Cantidad</label>
-                    <input id="cant" type="text" min="1" class="form-control"
-                      formControlName="cantidad" placeholder="Ej. 1" aria-label="Cantidad"
-                      aria-describedby="basic-addon1" />
-                  </div>
-                  <div class="alert alert-danger mt-2"
-                    [hidden]="formUser.get('cantidad')?.valid || formUser.get('cantidad')?.pristine">
-                    <span *ngIf="formUser.get('cantidad')?.errors?.['pattern']">
-                      La cantidad solo puede contener numeros enteros.
-                    </span>
-                  </div>
-                </li>
-              </ul>
-
-            </div>
-            <div class="card-footer text-center">
-              <div class="row">
-                <div class="col-6"><button class="btn btn-outline-primary" style="width: 100%;"
-                    (click)="agregarProducto()" [disabled]="formUser.invalid"><i class="fa-solid fa-circle-plus"></i>
-                    Agregar <i class="fa-solid fa-circle-plus"></i></button></div>
-                <div class="col-6"><button class="btn btn-outline-success" style="width: 100%;" (click)="cargarNC()"
-                    [disabled]="formUser.invalid"><i class="fa-solid fa-receipt"></i> Registrar <i
-                      class="fa-solid fa-receipt"></i></button></div>
-              </div>
-            </div>
-          </form>
+    <div class="col-lg-10 col-xl-8 col-xxl-6">
+      <div class="card">
+        <div class="card-body table-responsive">
+          <table class="table table-dark table-striped">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Impuesto</th>
+                <th>Cantidad</th>
+                <th>Quitar</th>
+              </tr>
+            </thead>
+            <tbody class="text-center">
+              <tr *ngFor="let datos of campos">
+                <td>
+                  {{datos.nombre}}
+                </td>
+                <td>
+                  ${{datos.precio}}
+                </td>
+                <td>
+                  ${{datos.impuesto}}
+                </td>
+                <td>
+                  {{datos.cantidad}}
+                </td>
+                <td>
+                  <i class="fa-regular fa-trash-can" (click)="reducir(datos)" style="cursor: pointer;"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-      <div class="col-lg-10 col-xl-8 col-xxl-6">
-        <div class="card">
-          <div class="card-body table-responsive">
-            <table class="table table-dark table-striped">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Precio</th>
-                  <th>Impuesto</th>
-                  <th>Cantidad</th>
-                  <th>Quitar</th>
-                </tr>
-              </thead>
-              <tbody class="text-center">
-                <tr *ngFor="let datos of campos">
-                  <td>
-                    {{datos.nombre}}
-                  </td>
-                  <td>
-                    ${{datos.precio}}
-                  </td>
-                  <td>
-                    ${{datos.impuesto}}
-                  </td>
-                  <td>
-                    {{datos.cantidad}}
-                  </td>
-                  <td>
-                    <i class="fa-regular fa-trash-can" (click)="reducir(datos)" style="cursor: pointer;"></i>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="card-body">
+          <div class="input-group my-2">
+            <label class="input-group-text" for="subtotal">Subtotal $</label>
+            <input id="subtotal" type="number" class="form-control" placeholder="$000.00" step=".01"
+              aria-label="Username" aria-describedby="basic-addon1" [value]="subtotal" disabled />
           </div>
-          <div class="card-body">
-            <div class="input-group my-2">
-              <label class="input-group-text" for="subtotal">Subtotal $</label>
-              <input id="subtotal" type="number" class="form-control" placeholder="$000.00" step=".01"
-                aria-label="Username" aria-describedby="basic-addon1" [value]="subtotal" disabled />
-            </div>
-            <div class="input-group my-2">
-              <label class="input-group-text" for="imp">Impuestos $</label>
-              <input id="imp" type="number" class="form-control" placeholder="$000.00" step=".01" aria-label="Username"
-                aria-describedby="basic-addon1" [value]="impuestosTotal" disabled />
-            </div>
-            <div class="input-group my-2">
-              <label class="input-group-text" for="total">Total $</label>
-              <input id="total" type="number" class="form-control" placeholder="$000.00" step=".01" aria-label="Username"
-                aria-describedby="basic-addon1" [value]="total" disabled />
-            </div>
+          <div class="input-group my-2">
+            <label class="input-group-text" for="imp">Impuestos $</label>
+            <input id="imp" type="number" class="form-control" placeholder="$000.00" step=".01" aria-label="Username"
+              aria-describedby="basic-addon1" [value]="impuestosTotal" disabled />
+          </div>
+          <div class="input-group my-2">
+            <label class="input-group-text" for="total">Total $</label>
+            <input id="total" type="number" class="form-control" placeholder="$000.00" step=".01" aria-label="Username"
+              aria-describedby="basic-addon1" [value]="total" disabled />
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <ng-template #iniciarSesion>
-    <div class="container my-4 text-center">
-      <h1>Inicie sesión para acceder a esta página</h1>
-    </div>
-  </ng-template>
+<ng-template #iniciarSesion>
+  <div class="container my-4 text-center">
+    <h1>Inicie sesión para acceder a esta página</h1>
+  </div>
+</ng-template>
