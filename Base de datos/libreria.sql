@@ -596,7 +596,7 @@ CREATE PROCEDURE nota_apartado_a_nota_venta(IN newFolioNA INT, IN newabono FLOAT
         IF done THEN
           LEAVE recorrer;
         END IF;
-        UPDATE producto 
+        UPDATE producto
         SET existencias = existencias + v_cant_prod 
         WHERE ISBN = v_prod_ISBN COLLATE utf8mb4_general_ci;
       END LOOP recorrer;
@@ -922,3 +922,66 @@ FROM
 --   LEFT JOIN productoeditorial pe ON p.ISBN = pe.productoISBN
 --   LEFT JOIN editorial ON pe.editorialIdEditorial = editorial.id_editorial
 -- GROUP BY autor.nombre, editorial.nombre, cliente.Nombre WITH ROLLUP;
+
+
+--funciones para hacer los calculos totales que se tuvieron en un rango de fechas determinado
+-- primer caso, total de compra
+CREATE FUNCTION calcular_total_compra(fecha_inicio DATE, fecha_fin DATE)
+RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE total_compras_val INT DEFAULT 0;
+
+    SELECT 
+       SUM(dnc.cantidadProducto*(dnc.precioProducto+dnc.impuesto)) AS total_compras
+    INTO total_compras_val
+    FROM notacompra nc, detallenc dnc
+    WHERE nc.FolioNC = dnc.notaCompraFolioNC
+    AND nc.fecha BETWEEN fecha_inicio AND fecha_fin;
+    
+    RETURN total_compras_val;
+END //
+
+DELIMITER ;
+
+-- segundo caso, total de ventas
+DELIMITER //
+
+CREATE FUNCTION calcular_total_venta(fecha_inicio DATE, fecha_fin DATE)
+RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE total_ventas_val INT DEFAULT 0;
+
+     SELECT 
+       SUM(dnv.cantidadProducto*(dnv.precioProducto+dnv.impuesto)) AS total_ventas
+    INTO total_ventas_val
+    FROM notaventa nv, detallenv dnv
+    WHERE nv.FolioNV = dnv.notaVentaFolioNV
+    AND nv.fechaVenta BETWEEN fecha_inicio AND fecha_fin;
+    
+    RETURN total_ventas_val;
+END //
+
+DELIMITER ;
+
+-- procedimiento para mandar llamar las funciones antes mencionadas
+-- y poder hacer la comparación de los valores
+DELIMITER //
+
+CREATE PROCEDURE calcular_totales(
+    IN fecha_inicio DATE,
+    IN fecha_fin DATE,
+    OUT total_ventas_val INT,
+    OUT total_compras_val INT
+)
+BEGIN
+    SELECT calcular_total_compra(fecha_inicio,fecha_fin) AS total_compras
+    INTO total_compras_val
+    FROM dual;
+
+    SELECT 
+        calcular_total_venta(fecha_inicio,fecha_fin) AS total_ventas
+    INTO total_ventas_val
+    FROM dual;
+END //
+
+DELIMITER ;
