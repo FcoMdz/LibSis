@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { SQLService, res } from 'src/app/services/sql.service';
 import { FormControl, Validators, FormGroup } from "@angular/forms";
 import Swal from 'sweetalert2';
+import { DropdownChangeEvent } from 'primeng/dropdown';
+import { body } from 'express-validator';
 
 @Component({
   selector: 'app-registrar',
@@ -10,48 +12,57 @@ import Swal from 'sweetalert2';
 })
 export class RegistrarComponent implements OnInit {
   usuario: any = sessionStorage.getItem('usuario');
-  options!: HTMLSelectElement;
-  ISBN!: HTMLInputElement;
-  nombre!: HTMLInputElement;
-  precio!: HTMLInputElement;
-  cantidad!: HTMLInputElement;
-  impuesto!: HTMLInputElement;
   btnReg!: HTMLButtonElement;
-  editorial!: HTMLSelectElement;
-  autor!: HTMLSelectElement;
-  productos!: any;
-  editoriales!: any;
-  autores!: any;
-  editorialesSelected: any[] = [];
-  autoresSelected: any[] = [];
-  editorialesPreSelected: any[] = [];
-  autoresPreSelected: any[] = [];
-  existencias: number = 0;
-
+  optionProd!:datosProducto|null;
+  productos: producto[] = []
+  listaProds: producto[] = []
+  autores: autores[] = []
+  editoriales: editorial[] = []
   formUser = new FormGroup({
     'isbn': new FormControl('', [Validators.required, Validators.minLength(13), Validators.maxLength(13), Validators.pattern('^[0-9]*$')]),
     'nombre': new FormControl('', [Validators.required]),
     'precio': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
-    'existencias': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
     'impuesto': new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(\.[0-9]+)?$')]),
+    'editoriales': new FormControl<editorial[] | null>([], Validators.required),
+    'autores': new FormControl<autores[] | null>([], Validators.required),
+    'productos': new FormControl<producto | null>(null, Validators.required)
   });
 
   constructor(private sql: SQLService) {
     if (this.usuario) this.usuario = JSON.parse(this.usuario);
   }
 
+  changeListenerProd(evento:DropdownChangeEvent) {
+    if (evento.value != null && evento.value.ISBN != "0") {
+      let body = {
+        ISBN: evento.value.ISBN
+      }
+      this.sql.alta(this.sql.URL + "/consulta/consProd", body)
+        .then((datosProd:any) => {
+          if(datosProd!=undefined){
+            this.optionProd = <datosProducto>datosProd
+            this.loadProducto(this.optionProd)
+          }
+        });
+    } else {
+      this.limpiarFormulario()
+      this.optionProd = null;
+    }
+  }
+
+  loadProducto(dataProd: datosProducto){
+    this.formUser.controls.isbn.setValue(dataProd.producto.ISBN)
+    this.formUser.controls.nombre.setValue(dataProd.producto.nombre)
+    this.formUser.controls.precio.setValue(dataProd.producto.precio.toString())
+    this.formUser.controls.impuesto.setValue(dataProd.producto.impuesto.toString())
+    this.formUser.controls.autores.setValue(<autores[]>dataProd.autores)
+    this.formUser.controls.editoriales.setValue(<editorial[]>dataProd.editoriales)
+    this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
+  }
+
   async ngOnInit(): Promise<void> {
     await this.getData();
-    this.options = <HTMLSelectElement>document.getElementById("options")!;
-    this.ISBN = <HTMLInputElement>document.getElementById("isbn")!;
-    this.nombre = <HTMLInputElement>document.getElementById("nombre")!;
-    this.precio = <HTMLInputElement>document.getElementById("precio")!;
-    this.cantidad = <HTMLInputElement>document.getElementById("cantidad")!;
-    this.impuesto = <HTMLInputElement>document.getElementById("impuesto")!;
     this.btnReg = <HTMLButtonElement>document.getElementById("btnReg")!;
-    this.editorial = <HTMLSelectElement>document.getElementById("editorial")!;
-    this.autor = <HTMLSelectElement>document.getElementById("autor")!;
-    this.initListeners();
   }
 
   async getData() {
@@ -61,148 +72,96 @@ export class RegistrarComponent implements OnInit {
   }
 
   limpiarFormulario() {
-    this.ISBN.removeAttribute('disabled');
-    this.ISBN.value = "";
-    this.nombre.value = "";
-    this.precio.value = "";
-    this.cantidad.value = "";
-    this.cantidad.min = "";
-    this.impuesto.value = "";
     this.btnReg.innerHTML = '<i class="fa-solid fa-book"></i> Registrar <i class="fa-solid fa-book"></i>';
-    this.deleteSelections(this.editorial, this.editorialesSelected);
-    this.deleteSelections(this.autor, this.autoresSelected);
-    this.editorialesSelected = [];
-    this.autoresSelected = [];
-    this.existencias = 0;
+    if(this.formUser.get('productos')?.value?.ISBN == '0'){
+      this.formUser.reset({
+        productos: this.formUser.get('productos')?.value
+      })
+    }else{
+      this.formUser.reset()
+    }
+
     this.btnReg.disabled = true;
   }
 
-  loadProducto(datosProducto: any) {
-    let datos = <datosProducto>datosProducto;
-    let producto = datos.producto;
-    this.autoresPreSelected = datos.autores;
-    this.editorialesPreSelected = datos.editoriales;
-    if (producto) {
-      this.btnReg.disabled = false;
-
-      this.ISBN.disabled = true;
-      this.ISBN.value = producto.ISBN;
-      this.nombre.value = producto.nombre;
-      this.precio.value = producto.precio.toString();
-      this.cantidad.value = producto.existencias.toString();
-      this.cantidad.min = producto.existencias.toString();
-      this.impuesto.value = producto.impuesto.toString();
-      this.btnReg.innerHTML = '<i class="fa-solid fa-pencil"></i> Actualizar <i class="fa-solid fa-pencil"></i>';
-      this.autoresSelected = [];
-      this.existencias = producto.existencias;
-      for (let i = 0; i < this.autor.options.length; i++) {
-        const element = this.autor.options[i];
-        element.selected = false;
-        for (let j = 0; j < this.autoresPreSelected.length; j++) {
-          const apl = this.autoresPreSelected[j];
-          if (apl.autorIdAutor == element.value) {
-            this.autoresSelected.push(element.value);
-            element.selected = true;
-          }
-        }
-      }
-      this.editorialesSelected = [];
-      for (let i = 0; i < this.editorial.options.length; i++) {
-        const element = this.editorial.options[i];
-        element.selected = false;
-        for (let j = 0; j < this.editorialesPreSelected.length; j++) {
-          const apl = this.editorialesPreSelected[j];
-          if (apl.editorialIdEditorial == element.value) {
-            this.editorialesSelected.push(element.value);
-            element.selected = true;
-          }
-        }
-      }
-    }
-  }
-
-  initListeners() {
-    this.options.addEventListener('change', (event) => {
-      if (this.options.value != "0") {
-        let body = {
-          ISBN: this.options.value
-        }
-        this.sql.alta(this.sql.URL + "/consProd", body)
-          .then((datosProducto) => {
-            this.loadProducto(datosProducto);
-          });
-      } else {
-        this.limpiarFormulario();
-      }
-    });
-    this.editorial.addEventListener('change', (event) => {
-      this.editorialesSelected = [];
-      this.changeSelections(this.editorial, this.editorialesSelected);
-    });
-    this.autor.addEventListener('change', (event) => {
-      this.autoresSelected = [];
-      this.changeSelections(this.autor, this.autoresSelected);
-    });
-  }
-
-  changeSelections(selection: HTMLSelectElement, array: any[]) {
-    for (let i = 0; i < selection.options.length; i++) {
-      const element = selection.options[i];
-      if (element.selected) {
-        array.push(element.value);
-      }
-    }
-  }
-
-  deleteSelections(selection: HTMLSelectElement, array: any[]) {
-    array = [];
-    for (let i = 0; i < selection.options.length; i++) {
-      const element = selection.options[i];
-      element.selected = false;
-    }
-  }
-
   async consProductos() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consProds")
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProds")
     consulta.forEach((producto) => {
-      this.productos = producto;
+      this.productos = <producto[]>producto;
+      this.productos.splice(0, 0, <producto>{
+          existencias: 0,
+          impuesto: 0,
+          ISBN: '0',
+          nombre: 'Nuevo Producto',
+          precio: 0,
+        })
     });
   }
 
   async consAutores() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consAutores")
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consAutores")
     consulta.forEach((autores) => {
-      this.autores = autores;
+      this.autores = <autores[]>autores;
     });
   }
 
   async consEditoriales() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consEditoriales")
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consEditoriales")
     consulta.forEach((editoriales) => {
-      this.editoriales = editoriales;
+      this.editoriales = <editorial[]>editoriales;
     });
   }
 
+  eliminarProducto(){
+    Swal.fire({
+      title: 'Registro de productos',
+      text: '¿Esta seguro de querer eliminar las existencias de este producto?',
+      icon: 'question',
+      showConfirmButton: true,
+      confirmButtonText: 'Eliminar',
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar'
+    }).then((resultado) => {
+      if(resultado.isConfirmed){
+        let body = {
+          ISBN: this.optionProd?.producto.ISBN
+        }
+        this.sql.alta(this.sql.URL + "/baja/Prod", body).then((res) => {
+          let respuesta = <res>res;
+          if (respuesta.success) {
+            Swal.fire('Registro de productos', 'Se han eliminado las existencias correctamente el producto', 'success');
+            this.limpiarFormulario();
+            this.getData();
+          } else {
+            Swal.fire('Registro', 'Ha ocurrido un error al eliminar las existencias el producto', 'error');
+          }
+        })
+      }
+    })
+    return;
+  }
+
   registrarProducto() {
-    if (Number(this.cantidad.value) < this.existencias) {
-      Swal.fire('Cantidad', 'La cantidad ingresada es menor que las existencias actuales', 'error')
-      return;
-    }
-    let autores: any[] | null = this.autoresSelected;
-    let editoriales: any[] | null = this.editorialesSelected;
-    if (this.autoresSelected.length == 0) autores = null;
-    if (this.editorialesSelected.length == 0) editoriales = null;
+    if (this.formUser.controls.autores.value?.length == 0
+        || this.formUser.controls.editoriales.value?.length == 0){
+          Swal.fire({
+            title: 'Registro de productos',
+            text: 'Debe seleccionar al menos una editorial y autor',
+            icon: 'info'
+          })
+          return;
+        }
     let body = {
-      ISBN: this.ISBN.value,
-      nombre: this.nombre.value,
-      precio: this.precio.value,
-      existencias: this.cantidad.value,
-      impuesto: this.impuesto.value,
-      editoriales: editoriales,
-      autores: autores
+      ISBN: this.formUser.controls.isbn.value,
+      ISBNant: this.optionProd?.producto.ISBN,
+      nombre: this.formUser.controls.nombre.value,
+      precio: this.formUser.controls.precio.value,
+      impuesto: this.formUser.controls.impuesto.value,
+      editoriales: this.formUser.controls.editoriales.value,
+      autores: this.formUser.controls.autores.value
     }
-    if (this.options.value == "0") {
-      this.sql.alta(this.sql.URL + "/RegProd", body).then((res) => {
+    if (this.optionProd == null) {
+      this.sql.alta(this.sql.URL + "/alta/Prod", body).then((res) => {
         let respuesta = <res>res;
         if (respuesta.success) {
           Swal.fire('Registro', 'Se ha registrado correctamente el producto', 'success');
@@ -213,7 +172,7 @@ export class RegistrarComponent implements OnInit {
         }
       })
     } else {
-      this.sql.alta(this.sql.URL + "/ActProd", body).then((res) => {
+      this.sql.alta(this.sql.URL + "/cambio/Prod", body).then((res) => {
         let respuesta = <res>res;
         if (respuesta.success) {
           Swal.fire('Actualizar', 'Se ha actualizado correctamente el producto', 'success');
@@ -225,13 +184,7 @@ export class RegistrarComponent implements OnInit {
 
       });
     }
-
   }
-
-  setButtinDisabled() {
-
-  }
-
 }
 
 interface datosProducto {
@@ -239,6 +192,7 @@ interface datosProducto {
   autores: any[];
   editoriales: any[];
 }
+
 interface producto {
   success: boolean;
   ISBN: string;
@@ -246,4 +200,15 @@ interface producto {
   precio: number;
   existencias: number;
   impuesto: number;
+}
+
+interface editorial {
+  id_editorial: Number;
+  nombre: String
+  telefono: String;
+}
+
+interface autores{
+  id_autor:Number;
+  nombre: String;
 }

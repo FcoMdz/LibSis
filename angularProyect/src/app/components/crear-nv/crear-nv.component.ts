@@ -46,15 +46,15 @@ export class CrearNVComponent implements OnInit {
   }
 
   async consClientes() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consCte");
-    consulta.forEach((cte) => {
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consCte");
+    consulta.forEach((cte:any) => {
       this.clientes = cte;
     });
   }
 
   async consProductos() {
-    let consulta = await this.sql.consulta(this.sql.URL + "/consProds")
-    consulta.forEach((producto) => {
+    let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProds")
+    consulta.forEach((producto:any) => {
       this.productos = producto;
     });
   }
@@ -65,7 +65,7 @@ export class CrearNVComponent implements OnInit {
         let body = {
           ISBN: this.options.value
         }
-        this.sql.alta(this.sql.URL + "/consProd", body)
+        this.sql.alta(this.sql.URL + "/consulta/consProd", body)
           .then((datosProducto) => {
             let producto = <datosProducto>datosProducto;
             let resultado = producto.producto;
@@ -114,7 +114,7 @@ export class CrearNVComponent implements OnInit {
     });
     let body = {
       idCte: this.Cte,
-      ISBNProds: ISBNS
+      ISBNProds: JSON.stringify(ISBNS)
     }
     if (!this.Cte || this.Cte == 0) {
       Swal.fire('Registro', 'Debe seleccionar un cliente para realizar la nota de venta', 'info');
@@ -124,14 +124,14 @@ export class CrearNVComponent implements OnInit {
       Swal.fire('Registro', 'Debe agregar productos para registrar la nota de venta', 'info');
       return;
     }
-    this.sql.alta(this.sql.URL + "/CrearNV", body)
+    this.sql.alta(this.sql.URL + "/alta/NV", body)
       .then((res) => {
         let resultado = <res>res;
         if (!resultado.success) {
           Swal.fire('Regisrar', 'Error al reigstrar la nota de venta: ' + resultado.err, 'error');
           return;
         }
-        Swal.fire('Registrar', 'Se ha registrado correctamente la nota de venta con Folio: ' + resultado.err, 'success').then(() => {
+        Swal.fire('Registrar', 'Se ha registrado correctamente la nota de venta con Folio: ' + resultado.id, 'success').then(() => {
           this.cliente.selectedIndex = 0;
           this.limpiarCampos();
           this.campos = [];

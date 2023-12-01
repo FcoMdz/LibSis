@@ -13,7 +13,7 @@ export class ConsultarNvComponent implements OnInit {
   NVs:infoNV[] = [];
   NVsfiltradas:infoNV[] = [];
   busqueda:string = "";
-  termino!:HTMLInputElement; 
+  termino!:HTMLInputElement;
   detalleNV!:any;
 
   constructor(private sql:SQLService){
@@ -24,22 +24,13 @@ export class ConsultarNvComponent implements OnInit {
   }
 
   async consNV(){
-    let consulta = await this.sql.consulta(this.sql.URL+"/ConsNV");
+    let consulta = await this.sql.consulta(this.sql.URL+"/consulta/ConsNV");
     let retornar:infoNV[] = [];
     consulta.forEach((nv: any)=>{
+      console.log(nv)
       this.NVs = <infoNV[]>nv;
       this.initBusqueda();
     });
-  }
-
-  async DetallesNotasVenta(){
-    console.log(this.NVs);
-    this.NVs.forEach((detalle: any) => {
-      console.log(detalle.folioNV)
-    });
-  
-    //let consulta = await this.sql.alta(this.sql.URL+"/ConsDetalleNV",)
- 
   }
 
   initBusqueda(){
@@ -65,22 +56,21 @@ export class ConsultarNvComponent implements OnInit {
     let body = {
       idNV:folio
     }
-    
+
     let vacio:detNV[] = [];
-    this.detalleNV = await this.sql.alta(this.sql.URL+"/ConsDetalleNV",body).then((res)=>{
-      console.log(res);
+    this.detalleNV = await this.sql.alta(this.sql.URL+"/consulta/ConsDetalleNV",body).then((res)=>{
       let details = <detNV[]>res || vacio;
       let detalles:string = "";
       let subtotal:number = 0;
       let impuestosTotal:number = 0;
       let total:number = 0;
       details.forEach((detail:detNV)=>{
-        subtotal += (detail.precioProducto*detail.cantidadProdcuto);
-        impuestosTotal += (detail.impuesto*detail.cantidadProdcuto);
+        subtotal += (detail.precioProducto*detail.cantidadProducto);
+        impuestosTotal += (detail.impuesto*detail.cantidadProducto);
         detalles += `
               <tr>
                 <td>$${detail.precioProducto}</td>
-                <td> ${detail.cantidadProdcuto} </td>
+                <td> ${detail.cantidadProducto} </td>
                 <td>$${detail.impuesto}</td>
                 <td>  ${detail.productoISBN}</td>
               </tr>
@@ -128,19 +118,20 @@ export class ConsultarNvComponent implements OnInit {
         width:'80%',
       });
     });
-    
+
   }
 }
 interface infoNV{
   clienteId_cte:number;
   fechaVenta:string;
   folioNV:number;
-
+  nombre: String;
 }
 interface detNV{
   precioProducto:number,
-  cantidadProdcuto:number,
+  cantidadProducto:number,
   impuesto:number,
   productoISBN:string,
-  notaVentaFolioNV:number
+  notaVentaFolioNV:number,
+  nombre: String
 }

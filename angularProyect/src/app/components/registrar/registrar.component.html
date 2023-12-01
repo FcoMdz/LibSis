@@ -1,4 +1,4 @@
-<div class="container" *ngIf=" usuario && (usuario.vendedor || usuario.admin); else iniciarSesion">
+<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion">
   <div class="row text-center">
     <div class="col-12">
       <h2>REGISTRO DE PRODUCTOS</h2>
@@ -13,10 +13,21 @@
             <li class="list-group-item">
               <div class="input-group">
                 <label class="input-group-text" for="options">Productos</label>
-                <select class="form-select" id="options">
-                  <option value="0" selected>Nuevo producto</option>
-                  <option *ngFor="let producto of productos" value="{{ producto.ISBN }}">{{producto.nombre}}</option>
-                </select>
+                <span style="width: 80%;">
+                  <p-dropdown
+                    inputId="options"
+                    (onChange)="changeListenerProd($event)"
+                    (onClear)="limpiarFormulario()"
+                    styleClass="w-100"
+                    [options] = "productos"
+                    formControlName="productos"
+                    optionLabel="nombre"
+                    [filter] = "true"
+                    filterBy = "nombre"
+                    [showClear]="true"
+                    placeholder="Seleccione un producto"
+                  ></p-dropdown>
+                </span>
               </div>
             </li>
             <li class="list-group-item">
@@ -32,11 +43,11 @@
                   El ISBN es requerido. <br>
                 </span>
                 <span *ngIf="formUser.get('isbn')?.errors?.['minlength']">
-                  El ISBN debe de ser de 13 numeros, te faltan {{ 13 - ISBN.value.length }}. <br>
+                  El ISBN debe de ser de 13 numeros <br>
                 </span>
 
                 <span *ngIf="formUser.get('isbn')?.errors?.['maxlength']">
-                  El ISBN debe de ser de 13 numeros, te sobran {{ ISBN.value.length - 13 }}. <br>
+                  El ISBN debe de ser de 13 numeros <br>
                 </span>
 
                 <span *ngIf="formUser.get('isbn')?.errors?.['pattern']">
@@ -48,10 +59,19 @@
             <li class="list-group-item">
               <div class="input-group">
                 <label class="input-group-text" for="editorial">Editoriales</label>
-                <select class="form-select form-control" size="3" multiple data-live-search="true" id="editorial">
-                  <option *ngFor="let editorial of editoriales" value="{{editorial.id_editorial}}">{{editorial.nombre}}
-                  </option>
-                </select>
+                <span style="width: 80%;">
+                  <p-multiSelect
+                    inputId="options"
+                    formControlName="editoriales"
+                    styleClass="w-100"
+                    [options] = "editoriales"
+                    optionLabel="nombre"
+                    [filter] = "true"
+                    filterBy = "nombre"
+                    [showClear]="true"
+                    placeholder="Seleccione las editoriales"
+                  ></p-multiSelect>
+                </span>
               </div>
 
             </li>
@@ -73,9 +93,19 @@
             <li class="list-group-item">
               <div class="input-group">
                 <label class="input-group-text" for="autor">Autores</label>
-                <select class="form-select form-control" size="3" multiple data-live-search="true" id="autor">
-                  <option *ngFor="let autor of autores" value="{{autor.id_autor}}">{{autor.nombre}}</option>
-                </select>
+                <span style="width: 80%;">
+                  <p-multiSelect
+                    inputId="options"
+                    styleClass="w-100"
+                    formControlName="autores"
+                    [options] = "autores"
+                    optionLabel="nombre"
+                    [filter] = "true"
+                    filterBy = "nombre"
+                    [showClear]="true"
+                    placeholder="Seleccione los autores"
+                  ></p-multiSelect>
+                </span>
               </div>
 
             </li>
@@ -100,25 +130,6 @@
             </li>
             <li class="list-group-item">
               <div class="input-group">
-                <label for="cantidad" class="input-group-text" id="basic-addon1">Existencias</label>
-                <input type="text" class="form-control" formControlName="existencias" placeholder="Ej. 1"
-                  aria-label="Username" aria-describedby="basic-addon1" id="cantidad" required />
-              </div>
-
-              <div class="alert alert-danger mt-2"
-                [hidden]="formUser.get('existencias')?.valid || formUser.get('existencias')?.pristine">
-                <span *ngIf="formUser.get('existencias')?.errors?.['required']">
-                  El numero de elementos en existencia es requerido.
-                </span>
-
-                <span *ngIf="formUser.get('existencias')?.errors?.['pattern']">
-                  El numero de elementos en existencia solo puede tener numeros.
-                </span>
-              </div>
-
-            </li>
-            <li class="list-group-item">
-              <div class="input-group">
                 <label for="impuesto" class="input-group-text" id="basic-addon1">Impuesto</label>
                 <input type="text" class="form-control" formControlName="impuesto" placeholder="Ej. 5"
                   aria-label="Username" aria-describedby="basic-addon1" id="impuesto" required />
@@ -129,7 +140,6 @@
                 <span *ngIf="formUser.get('impuesto')?.errors?.['required']">
                   El impuesto es requerido.
                 </span>
-
                 <span *ngIf="formUser.get('impuesto')?.errors?.['pattern']">
                   El impuesto solo puede tener numeros.
                 </span>
@@ -138,10 +148,17 @@
             </li>
           </ul>
         </div>
-        <div class="text-center my-2">
-          <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"
+        <div class="row my-2">
+          <span class="col text-center">
+            <button type="submit" class="btn btn-lg btn-primary" (click)="registrarProducto()" id="btnReg"
             [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar <i
               class="fa-solid fa-book"></i></button>
+          </span>
+          <span class="col text-center">
+            <button type="submit" class="btn btn-lg btn-danger" (click)="eliminarProducto()" id="btnElim"
+            [disabled]="formUser.invalid || formUser.controls.productos.value?.ISBN == '0'"><i class="fa-solid fa-trash-can"></i> Eliminar <i
+              class="fa-solid fa-trash-can"></i></button>
+          </span>
         </div>
       </form>
     </div>

@@ -42,7 +42,7 @@ export class InicioComponent implements OnInit{
       if(this.usuario.administrador) this.administracion.style.display = "block";
       if(this.usuario.vendedor || this.usuario.administrador) this.ventas.style.display = "block";
       if(this.usuario.vendedor || this.usuario.administrador) this.clientes.style.display = "block";
-      if(this.usuario.almacenista || this.usuario.administrador) this.compras.style.display = "block";
+      if(this.usuario.enccompras|| this.usuario.administrador) this.compras.style.display = "block";
     }
   }
 

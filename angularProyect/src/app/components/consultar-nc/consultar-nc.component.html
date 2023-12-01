@@ -1,7 +1,7 @@
-<div class="container" *ngIf=" usuario && (usuario.vendedor || usuario.administrador); else iniciarSesion">
+<div class="container" *ngIf=" usuario && (usuario.enccompras || usuario.administrador); else iniciarSesion">
     <div class="row">
       <div class="col-12">
-        <h2>CONSULTA DE LA NOTA DE VENTA</h2>
+        <h2>CONSULTA DE LA NOTA DE COMPRA</h2>
         <p>Ingrese el folio que quiere consultar</p>
       </div>
     </div>
@@ -19,16 +19,20 @@
             <tr>
               <th>Folio</th>
               <th>Fecha</th>
-              <th>Id Cliente</th>
-              <th>Nombre cliente</th>
+              <th>Id Proveedor</th>
+              <th>Nombre Proveedor</th>
+              <th>Borrar</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let nv of NVsfiltradas">
-              <td><button class="btn btn-outline-light" style="width: 100%;" (click)="mostrarDetalles(nv.folioNV)">{{nv.folioNV}}</button></td>
-              <td>{{nv.fechaVenta | date}}</td>
-              <td>{{nv.clienteId_cte}}</td>
-              <td>{{nv.nombre}}</td>
+            <tr *ngFor="let nc of NCsfiltradas">
+              <td><button class="btn btn-outline-light" style="width: 100%;" (click)="mostrarDetalles(nc.FolioNC)">{{nc.FolioNC}}</button></td>
+              <td>{{nc.Fecha | date}}</td>
+              <td>{{nc.proveedorId_proveedor}}</td>
+              <td>{{nc.nombre}}</td>
+              <td>
+                <i class="fa-regular fa-trash-can" (click)="eliminarNC(nc)" style="cursor: pointer;"></i>
+              </td>
           </tr>
           </tbody>
         </table>
