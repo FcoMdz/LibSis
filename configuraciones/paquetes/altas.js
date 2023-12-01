@@ -447,7 +447,8 @@ router.post("/Emp",
         if(sqlErr){
             res.send({
                     success:false, 
-                    err: sqlErr.message
+                    err: sqlErr.message,
+                    code: sqlErr.code
                 })
             return
         }

@@ -142,6 +142,7 @@ export class ConsultarNcComponent implements OnInit{
                 icon: 'success',
                 html: `Se ha eliminado correctamente la nota de compra`,
               })
+              this.ngOnInit()
             }else{
               let errores = ""
               if(resp.err.code == "ER_CHECK_CONSTRAINT_VIOLATED"){

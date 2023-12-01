@@ -87,6 +87,7 @@ export class CrearEmComponent implements OnInit{
 
   registrarEmpleado() {
     let body = {
+      usuarioAnt: this.option.usuario,
       usuario: this.formUser.controls.usuario.value,
       nombre: this.formUser.controls.nombre.value,
       contrasena: this.formUser.controls.contrasena.value,
@@ -94,7 +95,6 @@ export class CrearEmComponent implements OnInit{
       enccompras: (this.formUser.controls.enccompras.value ? true : false),
       administrador: (this.formUser.controls.administrador.value ? true : false)
     }
-    console.log(body)
     if (this.option.usuario == "Nuevo") {
       this.sql.alta(this.sql.URL + "/alta/Emp", body).then((res) => {
         let respuesta = <res>res;
@@ -103,18 +103,26 @@ export class CrearEmComponent implements OnInit{
           this.limpiarFormulario();
           this.getData();
         } else {
-          Swal.fire('Registro', 'Ha ocurrido un error al registrar el empleado, faltan datos ' + respuesta.err, 'error');
+          if(respuesta.code == "ER_DUP_ENTRY"){
+            Swal.fire('Registro', 'Ya existe un empleado con el mismo usuario, modifique el usuario', 'error')
+          }else{
+            Swal.fire('Registro', 'Ha ocurrido un error al registrar el empleado, faltan datos ' + respuesta.err, 'error');
+          }
         }
       })
     } else {
-      this.sql.alta(this.sql.URL + "/cambio/Prov", body).then((res) => {
+      this.sql.alta(this.sql.URL + "/cambio/Emp", body).then((res) => {
         let respuesta = <res>res;
         if (respuesta.success) {
           Swal.fire('Actualizar', 'Se ha actualizado correctamente el empleado', 'success');
           this.limpiarFormulario();
           this.getData();
         } else {
-          Swal.fire('Actualizar', 'Ha ocurrido un error al actualizar el empleado, faltan datos', 'error')
+          if(respuesta.code == "ER_DUP_ENTRY"){
+            Swal.fire('Actualizar', 'Ya existe un empleado con el mismo usuario, modifique el usuario', 'error')
+          }else{
+            Swal.fire('Actualizar', 'Ha ocurrido un error al actualizar el empleado, faltan datos', 'error')
+          }
         }
 
       });
@@ -122,21 +130,25 @@ export class CrearEmComponent implements OnInit{
   }
 
   eliminarEmpleado(){
-    let body = {
-      usuario: this.option.usuario
+    if(this.usuario.usuario != this.option.usuario){
+      let body = {
+        usuario: this.option.usuario
+      }
+        this.sql.alta(this.sql.URL + "/baja/Emp",body).then((res) => {
+          let respuesta = <res>res;
+          if (respuesta.success) {
+            Swal.fire('Eliminado', 'Se ha eliminado correctamente el Empleado', 'success');
+            this.limpiarFormulario();
+            this.getData();
+          } else {
+            Swal.fire('Eliminado', 'Ha ocurrido un error al eliminar el Empleado' + respuesta.err, 'error');
+          }
+        })
+      }else{
+        Swal.fire('Eliminar', 'No se puede eliminar el usuario que esta en la sesión', 'info')
+      }
     }
-      this.sql.alta(this.sql.URL + "/baja/Emp",body).then((res) => {
-        let respuesta = <res>res;
-        if (respuesta.success) {
-          Swal.fire('Eliminado', 'Se ha eliminado correctamente el Empleado', 'success');
-          this.limpiarFormulario();
-          this.getData();
-        } else {
-          Swal.fire('Eliminado', 'Ha ocurrido un error al eliminar el Empleado' + respuesta.err, 'error');
-        }
-      })
-
-    }
+    
 }
 
 interface empleado{

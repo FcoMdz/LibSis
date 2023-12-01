@@ -322,6 +322,39 @@ router.post("/Prov",
 }
 )
 
+router.post("/Emp",
+[
+    body('usuarioAnt').not().isEmpty().isString(),
+    body('usuario').not().isEmpty().isString(),
+    body('nombre').not().isEmpty().isString(),
+    body('contrasena').not().isEmpty().isString(),
+    body('vendedor').not().isEmpty().isBoolean(),
+    body('enccompras').not().isEmpty().isBoolean(),
+    body('administrador').not().isEmpty().isBoolean(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE usuario SET usuario=?,nombre=?,contrasena=?,vendedor=?,enccompras=?,administrador=? WHERE usuario=?`,
+     [body.usuario,body.nombre,body.contrasena, body.vendedor,body.enccompras,body.administrador,body.usuarioAnt],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message,
+                    code: sqlErr.code
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
 
 router.post("/Edit",
 [

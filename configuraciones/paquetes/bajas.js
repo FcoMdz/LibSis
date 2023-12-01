@@ -54,6 +54,31 @@ router.post('/Prov',
         })
     })
 })
+router.post('/Emp',
+[
+    body('usuario').not().isEmpty().isString()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success: false, err: errors})
+        return
+    }
+    let body = req.body
+    sql.query(`DELETE FROM usuario WHERE usuario=?`, 
+        [body.usuario], (sqlErr, sqrRes) => {
+        if(sqlErr){
+            res.send({
+                success: false,
+                err: sqlErr
+            })
+            return
+        }
+        res.send({
+            success: true
+        })
+    })
+})
 router.post('/NV',
 [
     body('folioNV').not().isEmpty().isString()
