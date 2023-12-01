@@ -5,10 +5,10 @@ const sql = require('../conection')
 
 router.post('/Prod', 
 [
+    body('ISBNant').not().isEmpty().isString(),
     body('ISBN').not().isEmpty().isString(),
     body('nombre').not().isEmpty().isString(),
     body('precio').not().isEmpty().isFloat(),
-    body('existencias').not().isEmpty().isInt(),
     body('impuesto').not().isEmpty().isInt(),
     body('editoriales').not().isEmpty().isArray(),
     body('autores').not().isEmpty().isArray(),
@@ -20,52 +20,60 @@ router.post('/Prod',
         return
     }
     let body = req.body
-    let errores = []
-    sql.query(`UPDATE producto SET nombre=?, precio=?, existencias=?, impuesto=? WHERE ISBN=?`,
-              [body.nombre, body.nombre, body.precio, body.existencias, body.impuesto, body.ISBN],(sqlErr, sqlRes) => {
+    sql.query(`UPDATE producto SET ISBN=?, nombre=?, precio=?, impuesto=? WHERE ISBN=?`,
+              [body.ISBN, body.nombre, body.precio, body.impuesto, body.ISBNant],(sqlErr, sqlRes) => {
         let autores = body.autores
         let editoriales = body.editoriales
         if(sqlErr){
-            errores += sqlErr.message
+            res.send({
+                success: false,
+                err: sqlErr.message
+            })
             return
         }
         sql.query(`DELETE FROM productoautor WHERE productoISBN=?`, [body.ISBN], (sqlErr1, sqlRes1) => {
             if(sqlErr1){
-                errores += sqlErr1.message
+                res.send({
+                    success: false,
+                    err: sqlErr1.message
+                })
                 return
             }
             autores.forEach(autor => {
-                sql.query(`INSERT INTO productoautor VALUES (?, ?)`, [autor, body.ISBN],(sqlErr2, sqlRes2) => {
+                sql.query(`INSERT INTO productoautor VALUES (?, ?)`, [autor.id_autor, body.ISBN],(sqlErr2, sqlRes2) => {
                     if(sqlErr2){
-                        errores += sqlErr2.message
+                        res.send({
+                            success: false,
+                            err: sqlErr2.message
+                        })
                         return
                     }
                 })
             })
         })
-        sql.query(`DELETE FROM productoeditorial WHERE productoISBN=?`, [body.ISBN], (sqlErr1, sqlRes1) => {
-            if(sqlErr1){
-                errores += sqlErr1.message
+        sql.query(`DELETE FROM productoeditorial WHERE productoISBN=?`, [body.ISBN], (sqlErr3, sqlRes1) => {
+            if(sqlErr3){
+                res.send({
+                    success: false,
+                    err: sqlErr3.message
+                })
                 return
             }
             editoriales.forEach(editorial => {
-                sql.query(`INSERT INTO productoeditorial VALUES (?, ?)`, [editorial, body.ISBN],(sqlErr2, sqlRes2) => {
-                    if(sqlErr2){
-                        errores += sqlErr2.message
+                sql.query(`INSERT INTO productoeditorial VALUES (?, ?)`, [editorial.id_editorial, body.ISBN],(sqlErr4, sqlRes2) => {
+                    if(sqlErr4){
+                        res.send({
+                            success: false,
+                            err: sqlErr4.message
+                        })
                         return
                     }
                 })
             })
         })
+        res.send({success:true})
     })
-    if(errores.length != 0){
-        res.send({ 
-            success:false, 
-            err: JSON.stringify(errores)
-        })
-        return
-    }
-    res.send({success:true})
+    
 }
 )
 
@@ -279,10 +287,129 @@ router.post('/Enc',
                 console.log(sqlErr)
                 return
             }
+            sql.commit()
             res.send({success:true})
         })
-    })
-    
+    }) 
 })
+
+router.post("/Prov",
+[
+    body('idProv').not().isEmpty().isInt(),
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString(),
+    body('rfc').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE proveedor SET nombre=?,telefono=?,RFC=? WHERE id_proveedor=?`, [body.nombre,body.telefono,body.rfc, body.idProv],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            console.log(sqlErr)
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
+
+router.post("/Emp",
+[
+    body('usuarioAnt').not().isEmpty().isString(),
+    body('usuario').not().isEmpty().isString(),
+    body('nombre').not().isEmpty().isString(),
+    body('contrasena').not().isEmpty().isString(),
+    body('vendedor').not().isEmpty().isBoolean(),
+    body('enccompras').not().isEmpty().isBoolean(),
+    body('administrador').not().isEmpty().isBoolean(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE usuario SET usuario=?,nombre=?,contrasena=?,vendedor=?,enccompras=?,administrador=? WHERE usuario=?`,
+     [body.usuario,body.nombre,body.contrasena, body.vendedor,body.enccompras,body.administrador,body.usuarioAnt],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message,
+                    code: sqlErr.code
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
+
+router.post("/Edit",
+[
+    body('idEdit').not().isEmpty().isInt(),
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE editorial SET nombre=?,telefono=? WHERE id_editorial=?`, [body.nombre,body.telefono, body.idEdit],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
+
+router.post("/Autor",
+[
+    body('idAutor').not().isEmpty().isInt(),
+    body('nombre').not().isEmpty().isString(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`UPDATE autor SET nombre=? WHERE id_autor=?`, [body.nombre,body.idAutor],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            success:true
+        })
+    })
+}
+)
 
 module.exports = router

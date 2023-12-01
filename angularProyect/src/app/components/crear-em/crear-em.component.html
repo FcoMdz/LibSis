@@ -1,0 +1,124 @@
+<div class="container" *ngIf=" usuario && (usuario.administrador); else iniciarSesion">
+    <div class="row text-center">
+      <div class="col-12">
+        <h2>REGISTRO DE EMPLEADOS</h2>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-8 col-xxl-6">
+        <form [formGroup]="formUser">
+          <div class="card">
+            <div class="card-header">Ingrese los siguientes datos</div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="options">Empleado</label>
+                  <span style="width: 80%;">
+                    <p-dropdown
+                      inputId="options"
+                      (onChange)="changeListener($event)"
+                      styleClass="w-100"
+                      [options] = "empleados"
+                      optionLabel="nombre"
+                      [filter] = "true"
+                      filterBy = "nombre"
+                      [showClear]="true"
+                      placeholder="Seleccione un empleado"
+                    ></p-dropdown>
+                  </span>
+
+                </div>
+              </li>
+
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="nombre" id="basic-addon1">Nombre</label>
+                  <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre del empleado"
+                    aria-label="Nombre empleado" aria-describedby="basic-addon1" id="nombre" required />
+                </div>
+
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('nombre')?.valid || formUser.get('nombre')?.pristine">
+                  <span *ngIf="formUser.get('nombre')?.errors?.['required']">
+                    El nombre es requerido.
+                  </span>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label class="input-group-text" for="telefono" id="basic-addon1">Usuario</label>
+                  <input type="text" class="form-control" formControlName="usuario" placeholder="Usuario para el inicio de sesion"
+                    aria-label="usuario" aria-describedby="basic-addon1" id="usuario" required />
+                </div>
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('usuario')?.valid || formUser.get('usuario')?.pristine">
+                  <span *ngIf="formUser.get('usuario')?.errors?.['required']">
+                    El usuario es requerido.
+                  </span>
+                  <span *ngIf="formUser.get('usuario')?.errors?.['maxlength']">
+                    El usuario no puede ser mayor a 20 caracteres.
+                  </span>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="input-group">
+                  <label for="rfc" class="input-group-text" id="basic-addon1">Contraseña</label>
+                  <input type="password" class="form-control" formControlName="contrasena" placeholder="Contraseña"
+                    aria-label="Contraseña" aria-describedby="basic-addon1" id="contrasena" required />
+                </div>
+
+                <div class="alert alert-danger mt-2"
+                  [hidden]="formUser.get('contrasena')?.valid || formUser.get('contrasena')?.pristine">
+                  <span *ngIf="formUser.get('contrasena')?.errors?.['required']">
+                    Es necesaria una contraseña.
+                  </span>
+                </div>
+
+              </li>
+              <div class="card-header">Permisos</div>
+              <li class="list-group-item">
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" formControlName="enccompras" value="true" id="checkEncCompras">
+                    <label class="form-check-label" for="checkEncCompras">
+                      Permisos de encargado de compras
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" formControlName="vendedor" value="true" id="checkVendedor">
+                    <label class="form-check-label" for="checkVendedor">
+                      Permisos de vendedor
+                    </label>
+
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" formControlName="administrador" value="true" id="checkAdmin">
+                    <label class="form-check-label" for="checkAdmin">
+                      Permisos Administrador
+                    </label>
+                  </div>
+              </li>
+            </ul>
+          </div>
+          <div class="row my-2">
+            <span class="col text-center">
+              <button type="submit" class="btn btn-lg btn-primary" (click)="registrarEmpleado()"
+              id="btnReg" [disabled]="formUser.invalid"><i class="fa-solid fa-book"></i> Registrar
+              <i class="fa-solid fa-book"></i></button>
+            </span>
+            <span class="col text-center">
+              <button type="submit" class="btn btn-lg btn-danger" (click)="eliminarEmpleado()" id="btnElm"
+              [disabled]="formUser.invalid || option.usuario=='Nuevo'"><i class="fa-solid fa-circle-xmark"></i> Eliminar
+              <i class="fa-solid fa-circle-xmark"></i></button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #iniciarSesion>
+    <div class="container my-4 text-center">
+      <h1>Inicie sesión para acceder a esta página</h1>
+    </div>
+  </ng-template>

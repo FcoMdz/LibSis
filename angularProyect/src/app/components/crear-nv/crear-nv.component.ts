@@ -47,14 +47,14 @@ export class CrearNVComponent implements OnInit {
 
   async consClientes() {
     let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consCte");
-    consulta.forEach((cte) => {
+    consulta.forEach((cte:any) => {
       this.clientes = cte;
     });
   }
 
   async consProductos() {
     let consulta = await this.sql.consulta(this.sql.URL + "/consulta/consProds")
-    consulta.forEach((producto) => {
+    consulta.forEach((producto:any) => {
       this.productos = producto;
     });
   }
@@ -126,7 +126,6 @@ export class CrearNVComponent implements OnInit {
     }
     this.sql.alta(this.sql.URL + "/alta/NV", body)
       .then((res) => {
-        console.log(res)
         let resultado = <res>res;
         if (!resultado.success) {
           Swal.fire('Regisrar', 'Error al reigstrar la nota de venta: ' + resultado.err, 'error');

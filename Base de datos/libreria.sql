@@ -397,7 +397,7 @@ ALTER TABLE `proveedor`
 --
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`usuario`),
-  ADD UNIQUE KEY `contrasena` (`contrasena`);
+  ADD UNIQUE KEY `usuario` (`usuario`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -616,6 +616,84 @@ GROUP BY autor.nombre, editorial.nombre, cliente.Nombre WITH ROLLUP;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
+-- Procedimientos
+--
+-- Procedimiento 1: Una vez que se termina de pagar un encargo y es entregado lo pasa a la nota de venta
+DELIMITER //
+CREATE PROCEDURE encargo_a_nota_venta(IN newFolioEncargo INT, IN newabono FLOAT, IN newestatus VARCHAR(2), IN newclienteId_cte INT)
+  BEGIN
+    DECLARE Idnv VARCHAR(18);
+    DECLARE v_total FLOAT;
+
+    -- Obtener el total del costo, para compararlo con el abono
+    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
+    INTO v_total
+    FROM detalleencargo
+    WHERE newFolioEncargo = detalleencargo.encargoFolioEncargo
+    GROUP BY detalleencargo.encargoFolioEncargo;
+    -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
+    IF v_total = newabono AND newestatus = 'ee' THEN
+      -- Obtener folioNV
+      INSERT INTO notaventa(fechaVenta, clienteId_cte)
+      VALUES (CURRENT_DATE(), newclienteId_cte);
+      SELECT LAST_INSERT_ID() INTO Idnv;
+      -- Se traspasan todos los detalles del encargo a una nota de venta
+      INSERT INTO detallenv(precioProducto, cantidadProducto, impuesto, productoISBN, notaVentaFolioNV)
+      SELECT precioProducto, cantidadProducto, impuestoProducto, productoISBN, Idnv
+      FROM detalleencargo
+      WHERE newFolioEncargo = detalleencargo.encargoFolioEncargo;
+	  END IF;
+  END
+//
+
+--Procedimiento 2: Una vez que se termina de pagar la nota de apartado y es entregada, la pasa a una nota de venta
+DELIMITER //
+CREATE PROCEDURE nota_apartado_a_nota_venta(IN newFolioNA INT, IN newabono FLOAT, IN newestatus VARCHAR(2), IN newclienteId_cte INT)
+  BEGIN
+    DECLARE Idnv VARCHAR(18);
+    DECLARE v_total FLOAT;
+    DECLARE v_cant_prod INT(11);
+    DECLARE v_prod_ISBN VARCHAR(18);
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cursor_detalles CURSOR FOR
+    SELECT cantidadProducto, productoISBN
+    FROM detallena
+    WHERE newFolioNA = detallena.notaApartadoFolioNA;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Obtener el total del costo, para compararlo con el abono
+    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
+    INTO v_total
+    FROM detallena
+    WHERE newFolioNA = detallena.notaApartadoFolioNA
+    GROUP BY detallena.notaApartadoFolioNA;
+    -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
+    IF v_total = newabono AND newestatus = 'ae' THEN
+      -- Obtener folioNV
+      INSERT INTO notaventa(fechaVenta, clienteId_cte)
+      VALUES (CURRENT_DATE(), newclienteId_cte);
+      SELECT LAST_INSERT_ID() INTO Idnv;
+      -- Se regresan la cantidad a existencias para que al insertarlo en los detalles
+      -- de venta, se vuelvan a quitar
+      OPEN cursor_detalles;
+      recorrer: LOOP
+        FETCH cursor_detalles INTO v_cant_prod, v_prod_ISBN;
+        IF done THEN
+          LEAVE recorrer;
+        END IF;
+        UPDATE producto
+        SET existencias = existencias + v_cant_prod 
+        WHERE ISBN = v_prod_ISBN COLLATE utf8mb4_general_ci;
+      END LOOP recorrer;
+      CLOSE cursor_detalles;
+      -- Se traspasan todos los detalles de la nota de apartado a una nota de venta
+      INSERT INTO detallenv(precioProducto, cantidadProducto, impuesto, productoISBN, notaVentaFolioNV)
+      SELECT precioProducto, cantidadProducto, impuestoProducto, productoISBN, Idnv
+      FROM detallena
+      WHERE newFolioNA = detallena.notaApartadoFolioNA;
+	  END IF;
+  END
+//
 
 --
 -- Triggers para la alta, actualización y baja de ventas
@@ -747,6 +825,9 @@ FOR EACH ROW
     ELSEIF v_total < new.abono THEN
       SIGNAL SQLSTATE '42001'
       SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    ELSEIF old.estatus = 'ae' THEN
+      SIGNAL SQLSTATE '42002'
+      SET MESSAGE_TEXT = 'Error: Esta nota de apartado ya ha sido entregada';
     END IF;
   END;
 //
@@ -756,49 +837,7 @@ CREATE TRIGGER actualiza_apartado
 AFTER UPDATE ON notaapartado
 FOR EACH ROW
   BEGIN
-    DECLARE Idnv VARCHAR(18);
-    DECLARE v_total FLOAT;
-    DECLARE v_cant_prod INT(11);
-    DECLARE v_prod_ISBN VARCHAR(18);
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE cursor_detalles CURSOR FOR
-    SELECT cantidadProducto, productoISBN
-    FROM detallena
-    WHERE new.FolioNA = detallena.notaApartadoFolioNA;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    -- Obtener el total del costo, para compararlo con el abono
-    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
-    INTO v_total
-    FROM detallena
-    WHERE new.FolioNA = detallena.notaApartadoFolioNA
-    GROUP BY detallena.notaApartadoFolioNA;
-
-    -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
-    IF v_total = new.abono AND new.estatus = 'ae' THEN
-      -- Obtener folioNV
-      INSERT INTO notaventa(fechaVenta, clienteId_cte)
-      VALUES (CURRENT_DATE(), NEW.clienteId_cte);
-      SELECT LAST_INSERT_ID() INTO Idnv;
-      -- Se regresan la cantidad a existencias para que al insertarlo en los detalles
-      -- de venta, se vuelvan a quitar
-      OPEN cursor_detalles;
-      recorrer: LOOP
-        FETCH cursor_detalles INTO v_cant_prod, v_prod_ISBN;
-        IF done THEN
-          LEAVE recorrer;
-        END IF;
-        UPDATE producto 
-        SET existencias = existencias + v_cant_prod 
-        WHERE ISBN = v_prod_ISBN COLLATE utf8mb4_general_ci;
-      END LOOP recorrer;
-      CLOSE cursor_detalles;
-      -- Se traspasan todos los detalles de la nota de apartado a una nota de venta
-      INSERT INTO detallenv(precioProducto, cantidadProducto, impuesto, productoISBN, notaVentaFolioNV)
-      SELECT precioProducto, cantidadProducto, impuestoProducto, productoISBN, Idnv
-      FROM detallena
-      WHERE NEW.FolioNA = detallena.notaApartadoFolioNA;
-	  END IF;
+    CALL nota_apartado_a_nota_venta(new.FolioNA, new.abono, new.estatus, new.clienteId_cte);
   END;
 //
 
@@ -868,6 +907,9 @@ FOR EACH ROW
     ELSEIF v_total < new.abono THEN
       SIGNAL SQLSTATE '42001'
       SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    ELSEIF old.estatus = 'ee' THEN
+      SIGNAL SQLSTATE '42002'
+      SET MESSAGE_TEXT = 'Error: Este encargo ya ha sido entregado';
     END IF;
   END;
 //
@@ -877,27 +919,155 @@ CREATE TRIGGER actualiza_encargo
 AFTER UPDATE ON encargo
 FOR EACH ROW
   BEGIN
-    DECLARE Idnv VARCHAR(18);
-    DECLARE v_total FLOAT;
-
-    -- Obtener el total del costo, para compararlo con el abono
-    SELECT round(sum((precioProducto+impuestoProducto) * cantidadProducto), 2)
-    INTO v_total
-    FROM detalleencargo
-    WHERE new.FolioEncargo = detalleencargo.encargoFolioEncargo
-    GROUP BY detalleencargo.encargoFolioEncargo;
-
-    -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
-    IF v_total = new.abono AND new.estatus = 'ee' THEN
-      -- Obtener folioNV
-      INSERT INTO notaventa(fechaVenta, clienteId_cte)
-      VALUES (CURRENT_DATE(), NEW.clienteId_cte);
-      SELECT LAST_INSERT_ID() INTO Idnv;
-      -- Se traspasan todos los detalles del encargo a una nota de venta
-      INSERT INTO detallenv(precioProducto, cantidadProducto, impuesto, productoISBN, notaVentaFolioNV)
-      SELECT precioProducto, cantidadProducto, impuestoProducto, productoISBN, Idnv
-      FROM detalleencargo
-      WHERE NEW.FolioEncargo = detalleencargo.encargoFolioEncargo;
-	  END IF;
+    CALL encargo_a_nota_venta(new.FolioEncargo, new.abono, new.estatus, new.clienteId_cte);
   END;
 //
+
+-- Vistas
+--
+-- Vista 1:  muestra detalles de las compras realizadas por cada cliente,
+-- incluyendo información sobre los productos comprados, las fechas de compra y los montos totales.
+CREATE VIEW DetallesComprasPorCliente AS
+SELECT
+  nc.FolioNC,
+  nc.Fecha,
+  c.Nombre AS Cliente,
+  p.nombre AS Producto,
+  dnc.precioProducto,
+  dnc.cantidadProducto,
+  dnc.impuesto,
+  (dnc.precioProducto * dnc.cantidadProducto) AS MontoTotal
+FROM
+  notacompra nc
+  JOIN proveedor pr ON nc.proveedorId_proveedor = pr.id_proveedor
+  JOIN detallenc dnc ON nc.FolioNC = dnc.notaCompraFolioNC
+  JOIN producto p ON dnc.productoISBN = p.ISBN
+  JOIN cliente c ON pr.nombre = c.Nombre;
+
+-- Vista 2: Muestra un resumen de los encargos realizados agrupados por autor, 
+-- incluyendo detalles sobre los productos encargados y los abonos realizados.
+CREATE VIEW ResumenEncargosPorAutor AS
+SELECT
+  a.nombre AS Autor,
+  p.nombre AS Producto,
+  e.FolioEncargo,
+  e.Abono,
+  de.precioProducto,
+  de.cantidadProducto,
+  de.impuestoProducto
+FROM
+  encargo e
+  JOIN cliente c ON e.clienteId_cte = c.id_cte
+  JOIN detalleencargo de ON e.FolioEncargo = de.encargoFolioEncargo
+  JOIN producto p ON de.productoISBN = p.ISBN
+  JOIN productoautor pa ON p.ISBN = pa.productoISBN
+  JOIN autor a ON pa.autorIdAutor = a.id_autor;
+
+-- vista 3: Proporciona un informe de las ventas realizadas por cada editorial,
+-- mostrando detalles sobre los productos vendidos, las fechas de venta y los montos totales.
+CREATE VIEW VentasPorEditorial AS
+SELECT
+  nv.folioNV,
+  nv.fechaVenta,
+  e.nombre AS Editorial,
+  p.nombre AS Producto,
+  dnv.precioProducto,
+  dnv.cantidadProducto, 
+  dnv.impuesto,
+  (dnv.precioProducto * dnv.cantidadProducto) AS MontoTotal
+FROM
+  notaventa nv
+  JOIN cliente c ON nv.clienteId_cte = c.id_cte
+  JOIN detallenv dnv ON nv.folioNV = dnv.notaVentaFolioNV
+  JOIN producto p ON dnv.productoISBN = p.ISBN
+  JOIN productoeditorial pe ON p.ISBN = pe.productoISBN
+  JOIN editorial e ON pe.editorialIdEditorial = e.id_editorial;
+
+-- Uso de intersec en 1 consulta
+-- Obtener clientes comunes en compras y encargos
+-- SELECT clienteId_cte AS ClienteID, Nombre AS ClienteNombre FROM encargo
+-- INTERSECT
+-- SELECT clienteId_cte, Nombre FROM notaventa;
+
+-- Uso de Rollup
+-- Si se requiere estructurar la consulta para obtener totales 
+-- para todas las combinaciones de autor, editorial y cliente
+-- SELECT
+--   autor.nombre AS Autor,
+--   editorial.nombre AS Editorial,
+--   cliente.Nombre AS Cliente,
+--   SUM(dnv.precioProducto * dnv.cantidadProducto) AS MontoTotal
+-- FROM
+--   notaventa nv
+--   LEFT JOIN cliente ON nv.clienteId_cte = cliente.id_cte
+--   LEFT JOIN detallenv dnv ON nv.folioNV = dnv.notaVentaFolioNV
+--   LEFT JOIN producto p ON dnv.productoISBN = p.ISBN
+--   LEFT JOIN productoautor pa ON p.ISBN = pa.productoISBN
+--   LEFT JOIN autor ON pa.autorIdAutor = autor.id_autor
+--   LEFT JOIN productoeditorial pe ON p.ISBN = pe.productoISBN
+--   LEFT JOIN editorial ON pe.editorialIdEditorial = editorial.id_editorial
+-- GROUP BY autor.nombre, editorial.nombre, cliente.Nombre WITH ROLLUP;
+
+
+--funciones para hacer los calculos totales que se tuvieron en un rango de fechas determinado
+-- primer caso, total de compra
+CREATE FUNCTION calcular_total_compra(fecha_inicio DATE, fecha_fin DATE)
+RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE total_compras_val INT DEFAULT 0;
+
+    SELECT 
+       SUM(dnc.cantidadProducto*(dnc.precioProducto+dnc.impuesto)) AS total_compras
+    INTO total_compras_val
+    FROM notacompra nc, detallenc dnc
+    WHERE nc.FolioNC = dnc.notaCompraFolioNC
+    AND nc.fecha BETWEEN fecha_inicio AND fecha_fin;
+    
+    RETURN total_compras_val;
+END //
+
+DELIMITER ;
+
+-- segundo caso, total de ventas
+DELIMITER //
+
+CREATE FUNCTION calcular_total_venta(fecha_inicio DATE, fecha_fin DATE)
+RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE total_ventas_val INT DEFAULT 0;
+
+     SELECT 
+       SUM(dnv.cantidadProducto*(dnv.precioProducto+dnv.impuesto)) AS total_ventas
+    INTO total_ventas_val
+    FROM notaventa nv, detallenv dnv
+    WHERE nv.FolioNV = dnv.notaVentaFolioNV
+    AND nv.fechaVenta BETWEEN fecha_inicio AND fecha_fin;
+    
+    RETURN total_ventas_val;
+END //
+
+DELIMITER ;
+
+-- procedimiento para mandar llamar las funciones antes mencionadas
+-- y poder hacer la comparación de los valores
+DELIMITER //
+
+CREATE PROCEDURE calcular_totales(
+    IN fecha_inicio DATE,
+    IN fecha_fin DATE,
+    OUT total_ventas_val INT,
+    OUT total_compras_val INT
+)
+BEGIN
+    SELECT calcular_total_compra(fecha_inicio,fecha_fin) AS total_compras
+    INTO total_compras_val
+    FROM dual;
+
+    SELECT 
+        calcular_total_venta(fecha_inicio,fecha_fin) AS total_ventas
+    INTO total_ventas_val
+    FROM dual;
+END //
+
+DELIMITER;
+    

@@ -18,4 +18,5 @@ export interface res{
   success: boolean;
   id: string;
   err: string;
+  code: string;
 }

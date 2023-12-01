@@ -8,7 +8,6 @@ router.post('/Prod',
     body('ISBN').not().isEmpty().isString(),
     body('nombre').not().isEmpty().isString(),
     body('precio').not().isEmpty().isFloat(),
-    body('existencias').not().isEmpty().isInt(),
     body('impuesto').not().isEmpty().isInt(),
     body('editoriales').not().isEmpty(),
     body('autores').not().isEmpty(),
@@ -20,11 +19,11 @@ router.post('/Prod',
         return
     }
     let body = req.body
-    sql.query(`INSERT INTO producto VALUES (?, ?, ?, ?, ?)`, [body.ISBN, body.nombre, body.precio, body.existencias, body.impuesto],(sqlErr, sqlRes) => {
+    sql.query(`INSERT INTO producto (ISBN, nombre, precio, impuesto, existencias) VALUES (?, ?, ?, ?, 0)`, [body.ISBN, body.nombre, body.precio, body.impuesto],(sqlErr, sqlRes) => {
         if(sqlErr){
             res.send({
                     success:false, 
-                    err: sqlErr
+                    err: sqlErr.message
                 })
             return
         }
@@ -32,7 +31,7 @@ router.post('/Prod',
         let editoriales = body.editoriales
         let errores = []
         autres.forEach(autor => {
-            sql.query(`INSERT INTO productoautor VALUES (?, ?)`, [autor, body.ISBN],(sqlErr2, sqlRes2) => {
+            sql.query(`INSERT INTO productoautor VALUES (?, ?)`, [autor.id_autor, body.ISBN],(sqlErr2, sqlRes2) => {
                 if(sqlErr2){
                     errores += sqlErr2.message
                     return
@@ -40,7 +39,7 @@ router.post('/Prod',
             })
         })
         editoriales.forEach(editorial => {
-            sql.query(`INSERT INTO productoeditorial VALUES (?, ?)`, [editorial, body.ISBN],(sqlErr2, sqlRes2) => {
+            sql.query(`INSERT INTO productoeditorial VALUES (?, ?)`, [editorial.id_editorial, body.ISBN],(sqlErr2, sqlRes2) => {
                 if(sqlErr2){
                     errores += sqlErr2.message
                     return
@@ -107,7 +106,7 @@ router.post('/NV',
                         sql.rollback()
                         res.send({
                                 success:false, 
-                                err: sqlErr1
+                                err: sqlErr1.message
                             })
                         return
                     }
@@ -118,7 +117,7 @@ router.post('/NV',
                                 sql.rollback()
                                 res.send({
                                     success: false, 
-                                    err: sqlErr2
+                                    err: sqlErr2.message
                                 })
                                 return
                             }
@@ -158,17 +157,14 @@ router.post('/NC',
             let productosAgregar = body.ISBNProds
             productosAgregar = JSON.parse(productosAgregar)
             let productos = []
-            productosGeneral.forEach(producto => {
-                let i = productosAgregar.map((e) => {return e.ISBN}).indexOf(producto.ISBN)
-                if(i!=-1){
-                    let data = {
-                        ISBN: producto.ISBN,
-                        costo: (productosAgregar[i].costo/(1+(productosAgregar[i].impuesto/100))).toFixed(2),
-                        cantidad: productosAgregar[i].cant,
-                        impuesto: (productosAgregar[i].costo - (productosAgregar[i].costo/(1+(productosAgregar[i].impuesto/100)))).toFixed(2)
-                    }
-                    productos.push(data)
+            productosAgregar.forEach(producto => {
+                let data = {
+                    ISBN: producto.ISBN,
+                    costo: producto.costo,
+                    cantidad: producto.cant,
+                    impuesto: producto.impuesto
                 }
+                productos.push(data)
             })
             var d = new Date()
             d.setTime(d.getTime() - (/* UTC-6 */ 6) * 60 * 60 * 1000)
@@ -177,26 +173,27 @@ router.post('/NC',
                 if(sqlErr1){
                     res.send({ array:null, 
                             success:false, 
-                            err: sqlErr1
+                            err: sqlErr1.message
                         })
                     return
-                }
-                let folioNC = sqlRes1.insertId
-                productos.forEach(producto => {
-                    sql.query(`INSERT INTO detallenc VALUES (?, ?, ?, ?, ?)`, [producto.ISBN, folioNC, producto.costo, producto.cantidad, producto.impuesto], (sqlErr2, sqlRes2) => {
-                        if(sqlErr2){
-                            res.send({
-                                success: false,
-                                err: sqlErr2
-                            })
-                            return
-                        }
-                        res.send({success:true, id: sqlRes1.insertId})
-                        sql.commit()
+                }else{
+                    let folioNC = sqlRes1.insertId
+                    productos.forEach(producto => {
+                        sql.query(`INSERT INTO detallenc VALUES (?, ?, ?, ?, ?)`, [producto.ISBN, folioNC, producto.costo, producto.cantidad, producto.impuesto], (sqlErr2, sqlRes2) => {
+                            if(sqlErr2){
+                                res.send({
+                                    success: false,
+                                    err: sqlErr2.message
+                                })
+                                return
+                            }else{
+                                sql.commit()
+                                
+                            }
+                        })
                     })
-                })
-
-                
+                    res.send({success:true, id: sqlRes1.insertId})
+                }
             })
         }
     })
@@ -246,7 +243,7 @@ router.post('/Enc',
                         sql.rollback()
                         res.send({ array:null, 
                                 success:false, 
-                                err: sqlErr1
+                                err: sqlErr1.message
                             })
                         return
                     }
@@ -257,7 +254,7 @@ router.post('/Enc',
                                 sql.rollback()
                                 res.send({
                                     success: false,
-                                    err: sqlErr2
+                                    err: sqlErr2.message
                                 })
                                 return
                             }
@@ -319,7 +316,7 @@ router.post('/NA',
                         sql.rollback()
                         res.send({
                                 success:false, 
-                                err: sqlErr1
+                                err: sqlErr1.message
                             })
                         return
                     }
@@ -330,7 +327,7 @@ router.post('/NA',
                                 sql.rollback()
                                 res.send({
                                     success: false,
-                                    err: sqlErr2
+                                    err: sqlErr2.message
                                 })
                                 return
                             }
@@ -344,6 +341,124 @@ router.post('/NA',
     })
     
 })
+
+router.post("/Prov",
+[
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString(),
+    body('rfc').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO proveedor (nombre,telefono,RFC) VALUES (?,?,?)`, [body.nombre,body.telefono,body.rfc],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
+router.post("/Edit",
+[
+    body('nombre').not().isEmpty().isString(),
+    body('telefono').not().isEmpty().isString()
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO editorial (nombre,telefono) VALUES (?,?)`, [body.nombre,body.telefono],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
+router.post("/Autor",
+[
+    body('nombre').not().isEmpty().isString(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO autor (nombre) VALUES (?)`, [body.nombre],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
+
+router.post("/Emp",
+[
+    body('usuario').not().isEmpty().isString(),
+    body('nombre').not().isEmpty().isString(),
+    body('contrasena').not().isEmpty().isString(),
+    body('vendedor').not().isEmpty().isBoolean(),
+    body('enccompras').not().isEmpty().isBoolean(),
+    body('administrador').not().isEmpty().isBoolean(),
+],
+(req,res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:errors})
+        return
+    }
+    let body = req.body
+    sql.query(`INSERT INTO usuario (usuario,nombre,contrasena,vendedor,almacenista,cajero,enccompras,administrador) 
+                VALUES (?,?,?,?,0,0,?,?)`, [body.usuario,body.nombre,body.contrasena,body.vendedor,body.enccompras,body.administrador],(sqlErr,sqlRes) => {
+        if(sqlErr){
+            res.send({
+                    success:false, 
+                    err: sqlErr.message,
+                    code: sqlErr.code
+                })
+            return
+        }
+        res.send({
+            array: sqlRes.affectedRows,
+            success:true
+        })
+    })
+}
+)
 
 module.exports = router
 
