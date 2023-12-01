@@ -9,7 +9,7 @@
   </div>
   <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-8 col-xxl-6">
-      <form [formGroup]="formGroup">
+      <form [formGroup]="formUser">
         <div class="card">
           <div class="card-header">Ingrese los siguientes datos</div>
           <ul class="list-group list-group-flush">
@@ -53,11 +53,11 @@
               <div
                 class="alert alert-danger mt-2"
                 [hidden]="
-                  formGroup.get('isbn')?.valid ||
-                  formGroup.get('isbn')?.pristine
+                  formUser.get('isbn')?.valid ||
+                  formUser.get('isbn')?.pristine
                 "
               >
-                <span *ngIf="formGroup.get('isbn')?.errors?.['required']">
+                <span *ngIf="formUser.get('isbn')?.errors?.['required']">
                   El ISBN es requerido. <br />
                 </span>
                 <span *ngIf="formUser.get('isbn')?.errors?.['minlength']">
@@ -68,7 +68,7 @@
                   El ISBN debe de ser de 13 numeros <br>
                 </span>
 
-                <span *ngIf="formGroup.get('isbn')?.errors?.['pattern']">
+                <span *ngIf="formUser.get('isbn')?.errors?.['pattern']">
                   EL ISBN solo puede tener numeros.
                 </span>
               </div>
@@ -111,11 +111,11 @@
               <div
                 class="alert alert-danger mt-2"
                 [hidden]="
-                  formGroup.get('nombre')?.valid ||
-                  formGroup.get('nombre')?.pristine
+                  formUser.get('nombre')?.valid ||
+                  formUser.get('nombre')?.pristine
                 "
               >
-                <span *ngIf="formGroup.get('nombre')?.errors?.['required']">
+                <span *ngIf="formUser.get('nombre')?.errors?.['required']">
                   El nombre es requerido.
                 </span>
               </div>
@@ -158,15 +158,15 @@
               <div
                 class="alert alert-danger mt-2"
                 [hidden]="
-                  formGroup.get('precio')?.valid ||
-                  formGroup.get('precio')?.pristine
+                  formUser.get('precio')?.valid ||
+                  formUser.get('precio')?.pristine
                 "
               >
-                <span *ngIf="formGroup.get('precio')?.errors?.['required']">
+                <span *ngIf="formUser.get('precio')?.errors?.['required']">
                   El precio es requerido.
                 </span>
 
-                <span *ngIf="formGroup.get('precio')?.errors?.['pattern']">
+                <span *ngIf="formUser.get('precio')?.errors?.['pattern']">
                   El precio solo puede tener numeros.
                 </span>
               </div>
@@ -192,11 +192,11 @@
               <div
                 class="alert alert-danger mt-2"
                 [hidden]="
-                  formGroup.get('impuesto')?.valid ||
-                  formGroup.get('impuesto')?.pristine
+                  formUser.get('impuesto')?.valid ||
+                  formUser.get('impuesto')?.pristine
                 "
               >
-                <span *ngIf="formGroup.get('impuesto')?.errors?.['required']">
+                <span *ngIf="formUser.get('impuesto')?.errors?.['required']">
                   El impuesto es requerido.
                 </span>
 
