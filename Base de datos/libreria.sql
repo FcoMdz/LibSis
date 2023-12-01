@@ -546,7 +546,6 @@ CREATE PROCEDURE encargo_a_nota_venta(IN newFolioEncargo INT, IN newabono FLOAT,
     FROM detalleencargo
     WHERE newFolioEncargo = detalleencargo.encargoFolioEncargo
     GROUP BY detalleencargo.encargoFolioEncargo;
-
     -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
     IF v_total = newabono AND newestatus = 'ee' THEN
       -- Obtener folioNV
@@ -583,7 +582,6 @@ CREATE PROCEDURE nota_apartado_a_nota_venta(IN newFolioNA INT, IN newabono FLOAT
     FROM detallena
     WHERE newFolioNA = detallena.notaApartadoFolioNA
     GROUP BY detallena.notaApartadoFolioNA;
-
     -- Compara que el costo sea menor o igual al abono total, por si hay problemas de redondeo con JS
     IF v_total = newabono AND newestatus = 'ae' THEN
       -- Obtener folioNV
@@ -742,6 +740,9 @@ FOR EACH ROW
     ELSEIF v_total < new.abono THEN
       SIGNAL SQLSTATE '42001'
       SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    ELSEIF old.estatus = 'ae' THEN
+      SIGNAL SQLSTATE '42002'
+      SET MESSAGE_TEXT = 'Error: Esta nota de apartado ya ha sido entregada';
     END IF;
   END;
 //
@@ -821,6 +822,9 @@ FOR EACH ROW
     ELSEIF v_total < new.abono THEN
       SIGNAL SQLSTATE '42001'
       SET MESSAGE_TEXT = 'Error: El monto abonado es mayor al precio total';
+    ELSEIF old.estatus = 'ee' THEN
+      SIGNAL SQLSTATE '42002'
+      SET MESSAGE_TEXT = 'Error: Este encargo ya ha sido entregado';
     END IF;
   END;
 //

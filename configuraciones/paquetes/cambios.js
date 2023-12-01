@@ -287,6 +287,7 @@ router.post('/Enc',
                 console.log(sqlErr)
                 return
             }
+            sql.commit()
             res.send({success:true})
         })
     }) 
