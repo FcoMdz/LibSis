@@ -268,4 +268,42 @@ router.post('/consDetalleNC',
         res.send(sqlRes)
     })
 })
+router.post('/procedure',
+[
+    body('fechaInicio').not().isEmpty().isString(),
+    body('fechaFinal').not().isEmpty().isString()
+],
+(req, res) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        res.json({success:false, err:JSON.stringify(errors)})
+        return
+    }
+    let body = req.body
+    sql.query(
+        'CALL calcular_totales(?, ?, @total_ventas, @total_compras)',
+        [body.fechaInicio, body.fechaFinal],
+        (error, results) => {
+          if (error) {
+            console.error('Error al llamar al procedimiento almacenado:', error);
+            return;
+          }
+    
+          // Obtener los resultados de las variables de sesión
+          connection.query('SELECT @total_ventas, @total_compras', (err, rows) => {
+            if (err) {
+              console.error('Error al obtener los resultados:', err);
+              return;
+            }
+    
+            const totalVentas = rows[0][0]['@total_ventas'];
+            const totalCompras = rows[0][0]['@total_compras'];
+    
+            console.log('Total de ventas:', totalVentas);
+            console.log('Total de compras:', totalCompras);
+    
+          });
+    });
+})
+
 module.exports = router
