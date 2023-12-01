@@ -2,9 +2,11 @@
   class="container"
   *ngIf="usuario && (usuario.vendedor || usuario.admin); else iniciarSesion"
 > -->
+<div>{{ formGroup.get('cliente')?.value }}</div>
+
 <div class="row text-center">
   <div class="col-12">
-    <h2>REGISTRAR NOTA DE VENTA</h2>
+    <h2>REGISTRAR ENCARGO</h2>
   </div>
 </div>
 <div class="row justify-content-center">
@@ -18,8 +20,8 @@
               <div class="input-group">
                 <label class="input-group-text" for="cliente">Clientes</label>
                 <span style="width: 85%">
-                  <p-dropdown [options]="countries" optionLabel="name" [filter]="true" filterBy="name"
-                    styleClass="w-100" formControlName="cliente" placeholder="Ej. PacoWeb 777">
+                  <p-dropdown id="cliente" [options]="countries" optionLabel="name" optionValue="value" [filter]="true"
+                    filterBy="name" styleClass="w-100" formControlName="cliente" placeholder="Ej. PacoWeb 777">
                   </p-dropdown>
                 </span>
               </div>
@@ -36,10 +38,10 @@
 
             <li class="list-group-item">
               <div class="input-group">
-                <label class="input-group-text" for="options">Productos</label>
+                <label class="input-group-text" for="producto">Productos</label>
                 <span style="width: 82%;">
-                  <p-dropdown [options]="countries" optionLabel="name" [filter]="true" filterBy="name"
-                    styleClass="w-100" formControlName="producto" placeholder="Ej. Espada Maestra">
+                  <p-dropdown id="producto" [options]="countries" optionLabel="name" optionValue="value" [filter]="true"
+                    filterBy="name" styleClass="w-100" formControlName="producto" placeholder="Ej. Espada Maestra">
                   </p-dropdown>
                 </span>
               </div>
@@ -68,10 +70,32 @@
                   aria-describedby="basic-addon1" step=".01" disabled />
               </div>
             </li>
+
             <li class="list-group-item">
               <div class="input-group">
-                <label for="cant" class="input-group-text" id="basic-addon1">Cantidad a abonar</label>
-                <input id="impuesto" type="text" class="form-control" placeholder="000.00" aria-label="Username"
+                <label class="input-group-text" for="estado">Estado</label>
+                <span style="width: 86.5%">
+                  <p-dropdown id="estado" [options]="estado_encargo" optionLabel="name" optionValue="value"
+                    [filter]="true" filterBy="name" styleClass="w-100" formControlName="estado"
+                    placeholder="Ej. Apartado Entregado">
+                  </p-dropdown>
+                </span>
+              </div>
+
+              <div class="alert alert-danger mt-2"
+                [hidden]="formGroup.get('cliente')?.valid || formGroup.get('cliente')?.pristine">
+
+                <span *ngIf="formGroup.get('cliente')?.errors?.['required']">
+                  Debes seleccionar un cliente.
+                </span>
+              </div>
+
+            </li>
+
+            <li class="list-group-item">
+              <div class="input-group">
+                <label for="abono" class="input-group-text" id="basic-addon1">Cantidad a abonar</label>
+                <input id="abono" type="text" class="form-control" placeholder="000.00" aria-label="Username"
                   aria-describedby="basic-addon1" step=".01" formControlName="abono" />
               </div>
 

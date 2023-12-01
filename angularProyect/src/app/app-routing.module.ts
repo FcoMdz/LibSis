@@ -9,11 +9,13 @@ import { RegClientesComponent } from './components/reg-clientes/reg-clientes.com
 import { ConsEncargoComponent } from './components/cons-encargo/cons-encargo.component';
 import { ConsNotaApartadoComponent } from './components/cons-nota-apartado/cons-nota-apartado.component';
 import { RegNeComponent } from './components/reg-ne/reg-ne.component';
+import { RegNaComponent } from './components/reg-na/reg-na.component';
 
 const routes: Routes = [
   { path: 'RegProd', component: RegistrarComponent },
   { path: 'RegClientes', component: RegClientesComponent },
   { path: 'RegNE', component: RegNeComponent },
+  { path: 'RegNA', component: RegNaComponent },
   { path: 'CrearNV', component: CrearNVComponent },
   { path: 'ConsNV', component: ConsultarNvComponent },
   { path: 'ConsEncargo', component: ConsEncargoComponent },
@@ -27,4 +29,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

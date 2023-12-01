@@ -1,23 +1,25 @@
 import { Component } from '@angular/core';
-import { FormGroup, Validators, FormControl } from '@angular/forms';
-import Swal from 'sweetalert2';
+import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 @Component({
-  selector: 'app-reg-ne',
-  templateUrl: './reg-ne.component.html',
-  styleUrls: ['./reg-ne.component.css'],
+  selector: 'app-reg-na',
+  templateUrl: './reg-na.component.html',
+  styleUrls: ['./reg-na.component.css']
 })
-export class RegNeComponent {
-  usuario: any = sessionStorage.getItem('usuario');
+export class RegNaComponent {
+
+  minDate: Date = new Date(); //Variable de control de fecha, se usa en <p-calendar> para poner la fecha minima (siempre es el dia de hoy).
 
   formGroup = new FormGroup({
     cliente: new FormControl('', [Validators.required]),
     producto: new FormControl('', [Validators.required]),
+    estado: new FormControl('', [Validators.required]),
     abono: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+(.[0-9]+)?$')]),
     cantidad: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
+    fecha_limite: new FormControl('', [Validators.required])
   });
 
-  countries = [
+  countries = [ //
     { name: 'Australia', value: 'AU' },
     { name: 'Brazil', value: 'BR' },
     { name: 'China', value: 'CN' },
@@ -30,10 +32,8 @@ export class RegNeComponent {
     { name: 'United States', value: 'US' },
   ];
 
-  estado_encargo = [
-    { name: 'Encargo Iniciado', value: 'ei' },
-    { name: 'Encargo en Camino', value: 'ec' },
-    { name: 'Encargo Recibido', value: 'er' },
-    { name: 'Encargo Entregado', value: 'ee' },
+  estado_apartado = [
+    { name: 'Apartado Iniciado', value: 'ai' },
+    { name: 'Apartado Entregado', value: 'ae' },
   ]
 }

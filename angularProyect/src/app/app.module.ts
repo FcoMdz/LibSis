@@ -18,6 +18,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConsEncargoComponent } from './components/cons-encargo/cons-encargo.component';
 import { ConsNotaApartadoComponent } from './components/cons-nota-apartado/cons-nota-apartado.component';
 import { RegNeComponent } from './components/reg-ne/reg-ne.component';
+import { RegNaComponent } from './components/reg-na/reg-na.component';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
   declarations: [
@@ -31,6 +33,7 @@ import { RegNeComponent } from './components/reg-ne/reg-ne.component';
     ConsEncargoComponent,
     ConsNotaApartadoComponent,
     RegNeComponent,
+    RegNaComponent,
   ],
   imports: [
     BrowserModule,
@@ -41,8 +44,9 @@ import { RegNeComponent } from './components/reg-ne/reg-ne.component';
     MultiSelectModule,
     DropdownModule,
     BrowserAnimationsModule,
+    CalendarModule
   ],
   providers: [SQLService],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }
