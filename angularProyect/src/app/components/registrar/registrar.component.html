@@ -13,7 +13,7 @@
             <li class="list-group-item">
               <div class="input-group">
                 <label class="input-group-text" for="options">Productos</label>
-                <span style="width: 84%;">
+                <span style="width: 83%;">
                   <p-dropdown inputId="options" (onChange)="changeListenerProd($event)" (onClear)="limpiarFormulario()"
                     styleClass="w-100" [options]="productos" formControlName="productos" optionLabel="nombre"
                     [filter]="true" filterBy="nombre" [showClear]="true"
@@ -51,7 +51,7 @@
             <li class="list-group-item">
               <div class="input-group">
                 <label class="input-group-text" for="editorial">Editoriales</label>
-                <span style="width: 83.8%;">
+                <span style="width: 83%;">
                   <p-multiSelect inputId="options" formControlName="editoriales" styleClass="w-100"
                     [options]="editoriales" optionLabel="nombre" [filter]="true" filterBy="nombre" [showClear]="true"
                     placeholder="Seleccione las editoriales"></p-multiSelect>
@@ -77,7 +77,7 @@
             <li class="list-group-item">
               <div class="input-group">
                 <label class="input-group-text" for="autor">Autores</label>
-                <span style="width: 86.8%;">
+                <span style="width: 86%;">
                   <p-multiSelect inputId="options" styleClass="w-100" formControlName="autores" [options]="autores"
                     optionLabel="nombre" [filter]="true" filterBy="nombre" [showClear]="true"
                     placeholder="Seleccione los autores"></p-multiSelect>

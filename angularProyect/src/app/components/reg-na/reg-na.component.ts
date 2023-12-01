@@ -7,8 +7,11 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
   styleUrls: ['./reg-na.component.css']
 })
 export class RegNaComponent {
-
   minDate: Date = new Date(); //Variable de control de fecha, se usa en <p-calendar> para poner la fecha minima (siempre es el dia de hoy).
+  usuario: any = sessionStorage.getItem('usuario');
+  constructor(){
+    if (this.usuario) this.usuario = JSON.parse(this.usuario);
+  }
 
   formGroup = new FormGroup({
     cliente: new FormControl('', [Validators.required]),

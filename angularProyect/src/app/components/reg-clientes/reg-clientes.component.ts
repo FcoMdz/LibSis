@@ -8,7 +8,9 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 })
 export class RegClientesComponent {
   usuario: any = sessionStorage.getItem('usuario');
-
+  constructor(){
+    if (this.usuario) this.usuario = JSON.parse(this.usuario);
+  }
   formGroup = new FormGroup({
     nombre: new FormControl('', [Validators.required]),
     telefono: new FormControl('', [

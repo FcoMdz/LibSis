@@ -6,5 +6,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./cons-nota-apartado.component.css']
 })
 export class ConsNotaApartadoComponent {
-
+  usuario: any = sessionStorage.getItem('usuario');
+  constructor(){
+    if (this.usuario) this.usuario = JSON.parse(this.usuario);
+  }
 }

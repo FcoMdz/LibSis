@@ -10,6 +10,10 @@ import Swal from 'sweetalert2';
 export class RegNeComponent {
   usuario: any = sessionStorage.getItem('usuario');
 
+  constructor(){
+    if (this.usuario) this.usuario = JSON.parse(this.usuario);
+  }
+
   formGroup = new FormGroup({
     cliente: new FormControl('', [Validators.required]),
     producto: new FormControl('', [Validators.required]),

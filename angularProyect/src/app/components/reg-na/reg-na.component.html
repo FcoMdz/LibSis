@@ -1,9 +1,8 @@
-<!-- <div
+<div
   class="container"
-  *ngIf="usuario && (usuario.vendedor || usuario.admin); else iniciarSesion"
-> -->
+  *ngIf="usuario && (usuario.vendedor || usuario.administrador); else iniciarSesion"
+>
 <div>{{ formGroup.get('fecha_limite')?.value }}</div>
-
 <div class="row text-center">
     <div class="col-12">
         <h2>REGISTRAR NOTA DE APARTADO</h2>
@@ -19,7 +18,7 @@
                         <li class="list-group-item">
                             <div class="input-group">
                                 <label class="input-group-text" for="cliente">Clientes</label>
-                                <span style="width: 85%">
+                                <span style="width: 82.3%">
                                     <p-dropdown id="cliente" [options]="countries" optionLabel="name"
                                         optionValue="value" [filter]="true" filterBy="name" styleClass="w-100"
                                         formControlName="cliente" placeholder="Ej. PacoWeb 777">
@@ -40,7 +39,7 @@
                         <li class="list-group-item">
                             <div class="input-group">
                                 <label class="input-group-text" for="producto">Productos</label>
-                                <span style="width: 82.5%;">
+                                <span style="width: 79%;">
                                     <p-dropdown id="producto" [options]="countries" optionLabel="name"
                                         optionValue="value" [filter]="true" filterBy="name" styleClass="w-100"
                                         formControlName="producto" placeholder="Ej. Espada Maestra">
@@ -76,7 +75,7 @@
                         <li class="list-group-item">
                             <div class="input-group">
                                 <label class="input-group-text" for="estado">Estado</label>
-                                <span style="width: 86.5%">
+                                <span style="width: 84.2%">
                                     <p-dropdown id="estado" [options]="estado_apartado" optionLabel="name"
                                         optionValue="value" [filter]="true" filterBy="name" styleClass="w-100"
                                         formControlName="estado" placeholder="Ej. Apartado Entregado">
@@ -137,7 +136,7 @@
                             <div class="input-group">
                                 <label for="fecha_limite" class="input-group-text" id="basic-addon1">Fecha
                                     Limite</label>
-                                <span style="width: 80%;">
+                                <span style="width: 75.4%;">
                                     <p-calendar id="fecha_limite" dateFormat="dd-mm-yy" formControlName="fecha_limite"
                                         [showIcon]="true" [showButtonBar]="true" [minDate]="minDate"
                                         styleClass="w-100"></p-calendar>
@@ -153,7 +152,7 @@
                             </div>
                         </li>
                     </ul>
-                </div>
+              </div>
                 <div class="card-footer text-center">
                     <div class="row">
                         <div class="col-6">
@@ -227,11 +226,11 @@
             </div>
         </div>
     </div>
+  </div>
+</div>
 
-    <!-- </div> -->
-
-    <ng-template #iniciarSesion>
-        <div class="container my-4 text-center">
-            <h1>Inicie sesión para acceder a esta página</h1>
-        </div>
-    </ng-template>
+<ng-template #iniciarSesion>
+    <div class="container my-4 text-center">
+        <h1>Inicie sesión para acceder a esta página</h1>
+    </div>
+</ng-template>
