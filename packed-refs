@@ -1,0 +1,7 @@
+# pack-refs with: peeled fully-peeled sorted 
+abacd4a8acc945719aed348cc4ac1d44f3663ae9 refs/heads/Back_end
+a385dc2db70def87538a679b25ab3af44348d4c5 refs/heads/Front-end
+b75afb19562accb95fcbe1589e17c5e66038deac refs/heads/Front_paco
+1873346d9e1156d7cb1c8de9eac08ba315b146ed refs/heads/form_validation
+348f4f61994e38b4969983c95b6bfd6a891fcdaf refs/heads/front_pacoman
+7113dc19bf7f06324a83669534d19f13d0fa3cf5 refs/heads/master
